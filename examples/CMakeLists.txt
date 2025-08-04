@@ -1,0 +1,2 @@
+add_subdirectory(NekoWallpaper)
+add_subdirectory(ImageDither)

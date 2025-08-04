@@ -1,0 +1,32 @@
+/***************************************************************************
+ * 
+ *  Copyright (c) 2025 haloperidozz
+ *
+ *  This source code is licensed under the MIT license found in the
+ *  LICENSE file in the root directory of this source tree.
+ * 
+ *  File:       winutilz.rc.in
+ *
+ ***************************************************************************/
+
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+PRODUCTVERSION  @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+FILEOS          VOS__WINDOWS32
+FILETYPE        VFT_DLL
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName", "@PROJECT_NAME@"
+            VALUE "FileDescription", "@PROJECT_NAME@ v@PROJECT_VERSION@"
+            VALUE "FileVersion", "@PROJECT_VERSION@"
+            VALUE "OriginalFilename", "@PROJECT_NAME@.dll"
+            VALUE "ProductName", "@PROJECT_NAME@"
+            VALUE "ProductVersion", "@PROJECT_VERSION@"
+        END
+    END
+END

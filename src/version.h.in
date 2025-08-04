@@ -1,0 +1,18 @@
+/***************************************************************************
+ * 
+ *  Copyright (c) 2025 haloperidozz
+ *
+ *  This source code is licensed under the MIT license found in the
+ *  LICENSE file in the root directory of this source tree.
+ * 
+ *  File:       version.h.in
+ *
+ ***************************************************************************/
+
+#ifndef VERSION_H_INCLUDED
+#define VERSION_H_INCLUDED
+
+#define PROJECT_VERSION_W      L"@PROJECT_VERSION@"
+#define PROJECT_VERSION_A       "@PROJECT_VERSION@"
+
+#endif /* VERSION_H_INCLUDED */
