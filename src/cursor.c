@@ -40,21 +40,35 @@ static LPCWSTR g_aszCursorRegistryNames[CURSOR_MAX] = {
     L"Wait"             /* OCR_WAIT          */
 };
 
-static BOOL
-IsValidCursorFile(
+#define MAKEFOURCC(a, b, c, d)                                  \
+    ((DWORD) ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24)))
+
+#define FOURCC_RIFF         MAKEFOURCC('R', 'I', 'F', 'F')
+#define FOURCC_ACON         MAKEFOURCC('A', 'C', 'O', 'N')
+
+#define DCFT_BUFFER_SIZE    12  /* 12 bytes is enough */
+
+typedef enum {
+    CURSOR_FILE_TYPE_CUR,
+    CURSOR_FILE_TYPE_ANI,
+    CURSOR_FILE_TYPE_UNKNOWN
+} CURSOR_FILE_TYPE;
+
+static CURSOR_FILE_TYPE
+DetermineCursorFileType(
     IN LPCWSTR  szFilePath
     )
 {
-    BYTE   abBuffer[12];
-    DWORD  dwReaded    = 0;
-    HANDLE hFile       = INVALID_HANDLE_VALUE;
-    BOOL   bResult     = FALSE;
-    WORD   wIdReserved, wIdType, wIdCount;
-    DWORD  dwRiff, dwType;
+    BYTE   abBuffer[DCFT_BUFFER_SIZE];
+    DWORD  dwReaded = 0;
+    HANDLE hFile    = INVALID_HANDLE_VALUE;
+    BOOL   bResult  = FALSE;
+    WORD   wIdReserved, wIdType, wIdCount;  /* .cur (ICO )  */
+    DWORD  dwChunkId, dwChunkType;          /* .ani (RIFF)  */
 
     if (szFilePath == NULL)
     {
-        return FALSE;
+        return CURSOR_FILE_TYPE_UNKNOWN;
     }
 
     hFile = CreateFileW(
@@ -68,21 +82,21 @@ IsValidCursorFile(
 
     if (hFile == INVALID_HANDLE_VALUE)
     {
-        return FALSE;
+        return CURSOR_FILE_TYPE_UNKNOWN;
     }
 
     bResult = ReadFile(
         hFile,
         abBuffer,
-        sizeof(abBuffer),
+        DCFT_BUFFER_SIZE,
         &dwReaded,
         NULL);
 
     CloseHandle(hFile);
 
-    if (bResult == FALSE || dwReaded < 6)
+    if (bResult == FALSE || dwReaded != DCFT_BUFFER_SIZE)
     {
-        return FALSE;
+        return CURSOR_FILE_TYPE_UNKNOWN;
     }
 
     wIdReserved = *((WORD*) &abBuffer[0]);
@@ -91,23 +105,26 @@ IsValidCursorFile(
 
     if (wIdReserved == 0 && wIdType == 2 && wIdCount >= 1)
     {
-        return TRUE;            /* .cur */
+        return CURSOR_FILE_TYPE_CUR;
     }
-    else if (dwReaded >= 12)
+
+    dwChunkId   = *((DWORD*) &abBuffer[0]);
+    dwChunkType = *((DWORD*) &abBuffer[8]);
+
+    if (dwChunkId == FOURCC_RIFF && dwChunkType == FOURCC_ACON)
     {
-        dwRiff = *((DWORD*) &abBuffer[0]);  /* RIFF */
-        dwType = *((DWORD*) &abBuffer[8]);  /* ACON */
-
-        /* 0x46 = 'F', 0x46 = 'F', 0x49 = 'I', 0x52 = 'R' */
-        /* 0x4E = 'N', 0x4F = 'O', 0x43 = 'C', 0x41 = 'A' */
-
-        if (dwRiff == 0x46464952 || dwType == 0x4E4F4341)
-        {
-            return TRUE;        /* .ani */
-        }
+        return CURSOR_FILE_TYPE_ANI;
     }
     
-    return FALSE;
+    return CURSOR_FILE_TYPE_UNKNOWN;
+}
+
+static inline BOOL
+IsValidCursorFile(
+    IN LPCWSTR  szFilePath
+    )
+{
+    return DetermineCursorFileType(szFilePath) != CURSOR_FILE_TYPE_UNKNOWN;
 }
 
 WUAPI BOOL
