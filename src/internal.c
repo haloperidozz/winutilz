@@ -13,6 +13,7 @@
 
 #include <shlobj.h>
 #include <shlwapi.h>
+#include <tchar.h>
 #include <strsafe.h>
 
 #include "winutilz.h"
