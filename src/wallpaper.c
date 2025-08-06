@@ -13,7 +13,6 @@
 
 #include <ntstatus.h>
 
-#include "strconv.h"
 #include "internal.h"
 
 #define REGISTRY_PATH_DESKTOP   L"Control Panel\\Desktop"
@@ -155,7 +154,7 @@ WuSetWallpaperA(
         return FALSE;
     }
 
-    if (AnsiToWide(szWallpaperPath, szwPath, MAX_PATH) == FALSE)
+    if (WuAnsiToWide(szWallpaperPath, szwPath, MAX_PATH) == FALSE)
     {
         return FALSE;
     }

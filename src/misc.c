@@ -14,7 +14,6 @@
 #include <strsafe.h>
 
 #include "undoc.h"
-#include "strconv.h"
 
 #define REGISTRY_PATH_COLORS    L"Control Panel\\Colors"
 
@@ -95,7 +94,7 @@ WuBrandingFormatStringA(
     LPWSTR szwBuffer = NULL;
     BOOL   bResult   = FALSE;
 
-    szwFormat = AnsiToWideHeapAlloc(szFormat);
+    szwFormat = WuAnsiToWideHeapAlloc(szFormat);
 
     if (szwFormat == NULL)
     {
@@ -119,7 +118,7 @@ WuBrandingFormatStringA(
         goto cleanup;
     }
 
-    bResult = WideToAnsi(szwBuffer, szBuffer, cchBufferSize);
+    bResult = WuWideToAnsi(szwBuffer, szBuffer, cchBufferSize);
 
 cleanup:
     if (szwBuffer != NULL)

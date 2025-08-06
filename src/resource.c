@@ -11,7 +11,7 @@
 
 #include "winutilz.h"
 
-#include "strconv.h"
+#include "internal.h"
 
 WUAPI BOOL
 WuResourceExists(
@@ -183,7 +183,7 @@ WuExtractResourceToFileA(
 
     szwResourceName = AnsiResParamToWideHeapAlloc(szResourceName);
     szwResourceType = AnsiResParamToWideHeapAlloc(szResourceType);
-    szwFilePath     = AnsiToWideHeapAlloc(szFilePath);
+    szwFilePath     = WuAnsiToWideHeapAlloc(szFilePath);
 
     bResult = WuExtractResourceToFileW(
         hInstance,

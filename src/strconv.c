@@ -9,10 +9,10 @@
  *
  ***************************************************************************/
 
-#include "strconv.h"
+#include "winutilz.h"
 
-BOOL
-AnsiToWide(
+WUAPI BOOL
+WuAnsiToWide(
     IN  LPCSTR  szAnsi,
     OUT LPWSTR  szWideBuffer,
     IN  ULONG   cchWideBufferMaxSize
@@ -36,8 +36,8 @@ AnsiToWide(
     return dwWritten > 0;
 }
 
-LPWSTR
-AnsiToWideHeapAlloc(
+WUAPI LPWSTR
+WuAnsiToWideHeapAlloc(
     IN LPCSTR   szAnsi
     )
 {
@@ -67,7 +67,7 @@ AnsiToWideHeapAlloc(
         return NULL;
     }
 
-    bResult = AnsiToWide(szAnsi, szwUnicode, cchUnicode);
+    bResult = WuAnsiToWide(szAnsi, szwUnicode, cchUnicode);
 
     if (bResult == FALSE)
     {
@@ -78,8 +78,8 @@ AnsiToWideHeapAlloc(
     return szwUnicode;
 }
 
-BOOL
-WideToAnsi(
+WUAPI BOOL
+WuWideToAnsi(
     IN  LPCWSTR szWide,
     OUT LPSTR   szAnsiBuffer,
     IN  ULONG   cchAnsiBufferMaxSize
@@ -105,8 +105,8 @@ WideToAnsi(
     return dwWritten > 0;
 }
 
-LPSTR
-WideToAnsiHeapAlloc(
+WUAPI LPSTR
+WuWideToAnsiHeapAlloc(
     IN LPCWSTR  szWide
     )
 {
@@ -133,7 +133,7 @@ WideToAnsiHeapAlloc(
         return NULL;
     }
 
-    bResult = WideToAnsi(szWide, szAnsi, cchAnsi);
+    bResult = WuWideToAnsi(szWide, szAnsi, cchAnsi);
 
     if (bResult == FALSE)
     {
@@ -143,30 +143,3 @@ WideToAnsiHeapAlloc(
     
     return szAnsi;
 }
-
-LPWSTR
-AnsiResParamToWideHeapAlloc(
-    IN LPCSTR   szAnsi
-    )
-{
-    if (IS_INTRESOURCE(szAnsi) || szAnsi == NULL)
-    {
-        return (LPWSTR) szAnsi;
-    }
-    else
-    {
-        return AnsiToWideHeapAlloc(szAnsi);
-    }
-}
-
-VOID
-SafeResParamHeapFree(
-    IN LPVOID   lpParam
-    )
-{
-    if (lpParam != NULL && IS_INTRESOURCE(lpParam) == TRUE)
-    {
-        HeapFree(GetProcessHeap(), 0, lpParam);
-    }
-}
-

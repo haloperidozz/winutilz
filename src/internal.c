@@ -11,12 +11,11 @@
 
 #include "internal.h"
 
-#include "winutilz.h"
-#include "strconv.h"
-
 #include <shlobj.h>
 #include <shlwapi.h>
 #include <strsafe.h>
+
+#include "winutilz.h"
 
 #define CACHE_DIRECTORY_NAME    L"WinUtilzCache"
 
@@ -175,7 +174,7 @@ SetSomethingFromUrl(
     }
     else
     {
-        szwUrl = AnsiToWideHeapAlloc((LPCSTR) szUrl);
+        szwUrl = WuAnsiToWideHeapAlloc((LPCSTR) szUrl);
     }
 
     if (szwUrl == NULL)
@@ -209,4 +208,30 @@ cleanup:
     }
 
     return bResult;
+}
+
+LPWSTR
+AnsiResParamToWideHeapAlloc(
+    IN LPCSTR   szAnsi
+    )
+{
+    if (IS_INTRESOURCE(szAnsi) || szAnsi == NULL)
+    {
+        return (LPWSTR) szAnsi;
+    }
+    else
+    {
+        return WuAnsiToWideHeapAlloc(szAnsi);
+    }
+}
+
+VOID
+SafeResParamHeapFree(
+    IN LPVOID   lpParam
+    )
+{
+    if (lpParam != NULL && IS_INTRESOURCE(lpParam) == TRUE)
+    {
+        HeapFree(GetProcessHeap(), 0, lpParam);
+    }
 }

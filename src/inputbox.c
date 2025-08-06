@@ -11,8 +11,6 @@
 
 #include "winutilz.h"
 
-#include "strconv.h"
-
 #define IDC_OK      IDOK
 #define IDC_CANCEL  IDCANCEL
 #define IDC_PROMPT  1001
@@ -218,9 +216,9 @@ WuInputBoxIndirectA(
 
     ZeroMemory(&wParams, sizeof(INPUTBOXPARAMSW));
 
-    szPrompt  = AnsiToWideHeapAlloc(pParams->szPrompt);
-    szTitle   = AnsiToWideHeapAlloc(pParams->szTitle);
-    szDefault = AnsiToWideHeapAlloc(pParams->szDefault);
+    szPrompt  = WuAnsiToWideHeapAlloc(pParams->szPrompt);
+    szTitle   = WuAnsiToWideHeapAlloc(pParams->szTitle);
+    szDefault = WuAnsiToWideHeapAlloc(pParams->szDefault);
 
     if (pParams->szInput != NULL)
     {
@@ -248,7 +246,7 @@ WuInputBoxIndirectA(
 
     if (szInput != NULL && szInput != NULL)
     {
-        bResult = WideToAnsi(
+        bResult = WuWideToAnsi(
             szInput,
             pParams->szInput,
             pParams->cchInputMaxSize);

@@ -13,7 +13,6 @@
 
 #include <strsafe.h>
 
-#include "strconv.h"
 #include "undoc.h"
 
 #define CLIPBOARD_RETRY_COUNT       5
@@ -143,7 +142,7 @@ WuSetClipboardTextA(
     LPWSTR szwClipboardText = NULL;
     BOOL   bResult          = FALSE;
 
-    szwClipboardText = AnsiToWideHeapAlloc(szClipboardText);
+    szwClipboardText = WuAnsiToWideHeapAlloc(szClipboardText);
 
     if (szwClipboardText == NULL)
     {
@@ -249,7 +248,7 @@ WuGetClipboardTextA(
         goto cleanup;
     }
 
-    bResult = WideToAnsi(
+    bResult = WuWideToAnsi(
         szwClipboardText,
         szClipboardText,
         cchClipboardText);

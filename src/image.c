@@ -14,8 +14,6 @@
 #include <versionhelpers.h>
 #include <wincodec.h>
 
-#include "strconv.h"
-
 #define CLEANUP_IF_FAILED(hResult)                  \
     if (FAILED(hResult))                            \
     {                                               \
@@ -424,7 +422,7 @@ WuSaveImageDataToFileA(
         return FALSE;
     }
 
-    if (AnsiToWide(szFilePath, szwFilePath, MAX_PATH) == FALSE)
+    if (WuAnsiToWide(szFilePath, szwFilePath, MAX_PATH) == FALSE)
     {
         return FALSE;
     }
@@ -582,7 +580,7 @@ WuLoadImageDataFromFileA(
         return FALSE;
     }
 
-    if (AnsiToWide(szFilePath, szwFilePath, MAX_PATH) == FALSE)
+    if (WuAnsiToWide(szFilePath, szwFilePath, MAX_PATH) == FALSE)
     {
         return FALSE;
     }

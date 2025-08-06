@@ -12,7 +12,6 @@
 #include "winutilz.h"
 
 #include "undoc.h"
-#include "strconv.h"
 
 #define PROCESS_PRIVILEGE_MAX   37
 
@@ -382,7 +381,7 @@ WuRunCommandA(
     LPWSTR szwCommand = NULL;
     BOOL   bResult    = FALSE;
 
-    szwCommand = AnsiToWideHeapAlloc(szCommand);
+    szwCommand = WuAnsiToWideHeapAlloc(szCommand);
 
     if (szwCommand == NULL)
     {

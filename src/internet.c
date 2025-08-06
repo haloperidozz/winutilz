@@ -13,7 +13,6 @@
 
 #include <wininet.h>    /* TODO: WinHTTP? */
 
-#include "strconv.h"
 #include "version.h"
 
 #define USER_AGENT  L"WinUtilz/" PROJECT_VERSION_W
@@ -213,14 +212,14 @@ WuDownloadFileA(
         return FALSE;
     }
 
-    szwURL = AnsiToWideHeapAlloc(szURL);
+    szwURL = WuAnsiToWideHeapAlloc(szURL);
 
     if (szwURL == NULL)
     {
         return FALSE;
     }
 
-    if (AnsiToWide(szDestPath, szwDestPath, MAX_PATH) == FALSE)
+    if (WuAnsiToWide(szDestPath, szwDestPath, MAX_PATH) == FALSE)
     {
         goto cleanup;
     }
@@ -346,7 +345,7 @@ WuDownloadToMemoryA(
         return FALSE;
     }
 
-    szwURL = AnsiToWideHeapAlloc(szURL);
+    szwURL = WuAnsiToWideHeapAlloc(szURL);
 
     if (szwURL == NULL)
     {

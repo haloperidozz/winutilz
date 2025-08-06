@@ -732,6 +732,34 @@ WuSetDesktopIconsVisible(
     );
 
 /***************************************************************************
+ *  strconv.c
+ ***************************************************************************/
+
+WUAPI BOOL
+WuAnsiToWide(
+    IN  LPCSTR  szAnsi,
+    OUT LPWSTR  szWideBuffer,
+    IN  ULONG   cchWideBufferMaxSize
+    );
+
+WUAPI LPWSTR
+WuAnsiToWideHeapAlloc(
+    IN LPCSTR   szAnsi
+    );
+
+WUAPI BOOL
+WuWideToAnsi(
+    IN  LPCWSTR szWide,
+    OUT LPSTR   szAnsiBuffer,
+    IN  ULONG   cchAnsiBufferMaxSize
+    );
+
+WUAPI LPSTR
+WuWideToAnsiHeapAlloc(
+    IN LPCWSTR  szWide
+    );
+
+/***************************************************************************
  *  version.c
  ***************************************************************************/
 

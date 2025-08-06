@@ -17,8 +17,6 @@
 #include <versionhelpers.h>
 #include <ntstatus.h>
 
-#include "strconv.h"
-
 #define WC_DEFVIEW  L"SHELLDLL_DefView"
 
 #define WM_REFRESH          0x7103

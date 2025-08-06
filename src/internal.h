@@ -43,4 +43,14 @@ SetSomethingFromUrl(
     IN DWORD            dwExtraValue
     );
 
+LPWSTR
+AnsiResParamToWideHeapAlloc(
+    IN LPCSTR   szAnsi
+    );
+
+VOID
+SafeResParamHeapFree(
+    IN LPVOID   lpParam
+    );
+
 #endif /* INTERNAL_H_INCLUDED */

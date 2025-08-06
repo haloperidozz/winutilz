@@ -13,7 +13,6 @@
 
 #include <ntstatus.h>
 
-#include "strconv.h"
 #include "internal.h"
 
 #define REGISTRY_PATH_CURSORS   L"Control Panel\\Cursors"
@@ -197,7 +196,7 @@ WuSetCursorA(
         return FALSE;
     }
 
-    if (AnsiToWide(szCursorPath, szwPath, MAX_PATH) == FALSE)
+    if (WuAnsiToWide(szCursorPath, szwPath, MAX_PATH) == FALSE)
     {
         return FALSE;
     }
@@ -296,7 +295,7 @@ WuGetCursorA(
         return FALSE;
     }
 
-    return WideToAnsi(szwTempPath, szCursorPath, cchCursorPath);
+    return WuWideToAnsi(szwTempPath, szCursorPath, cchCursorPath);
 }
 
 WUAPI BOOL
