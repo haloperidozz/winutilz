@@ -39,11 +39,11 @@ static LPCWSTR g_aszCursorRegistryNames[CURSOR_MAX] = {
     L"Wait"             /* OCR_WAIT          */
 };
 
-#define MAKEFOURCC(a, b, c, d)                                  \
-    ((DWORD) ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24)))
+#define MAKE_FOURCC(ch1, ch2, ch3, ch4)                                 \
+    ((DWORD) ((ch1) | ((ch2) << 8) | ((ch3) << 16) | ((ch4) << 24)))
 
-#define FOURCC_RIFF         MAKEFOURCC('R', 'I', 'F', 'F')
-#define FOURCC_ACON         MAKEFOURCC('A', 'C', 'O', 'N')
+#define FOURCC_RIFF_ID      MAKE_FOURCC('R', 'I', 'F', 'F')
+#define FOURCC_ACON_ID      MAKE_FOURCC('A', 'C', 'O', 'N')
 
 #define DCFT_BUFFER_SIZE    12  /* 12 bytes is enough */
 
@@ -110,7 +110,7 @@ DetermineCursorFileType(
     dwChunkId   = *((DWORD*) &abBuffer[0]);
     dwChunkType = *((DWORD*) &abBuffer[8]);
 
-    if (dwChunkId == FOURCC_RIFF && dwChunkType == FOURCC_ACON)
+    if (dwChunkId == FOURCC_RIFF_ID && dwChunkType == FOURCC_ACON_ID)
     {
         return CURSOR_FILE_TYPE_ANI;
     }
