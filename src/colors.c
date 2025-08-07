@@ -118,7 +118,7 @@ WuSaveSysColors(
             0,
             REG_SZ,
             (CONST BYTE*) szRgbString,
-            (lstrlenW(szRgbString) + 1) * sizeof(TCHAR));
+            (lstrlenW(szRgbString) + 1) * sizeof(WCHAR));
         
         if (lStatus != ERROR_SUCCESS)
         {
