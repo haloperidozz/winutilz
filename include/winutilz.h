@@ -28,6 +28,30 @@ extern "C" {
 #endif /* __cplusplus */
 
 /***************************************************************************
+ *  branding.c
+ ***************************************************************************/
+
+WUAPI BOOL
+WuBrandingFormatStringW(
+    IN  LPCWSTR szFormat,
+    OUT LPWSTR  szBuffer,
+    IN  ULONG   cchBufferSize
+    );
+
+WUAPI BOOL
+WuBrandingFormatStringA(
+    IN  LPCSTR  szFormat,
+    OUT LPSTR   szBuffer,
+    IN  ULONG   cchBufferSize
+    );
+
+#ifdef UNICODE
+    #define WuBrandingFormatString WuBrandingFormatStringW
+#else /* UNICODE */
+    #define WuBrandingFormatString WuBrandingFormatStringA
+#endif /* UNICODE */
+
+/***************************************************************************
  *  cursor.c
  ***************************************************************************/
 
@@ -292,6 +316,19 @@ WuGetClipboardImageData(
     );
 
 /***************************************************************************
+ *  colors.c
+ ***************************************************************************/
+
+#define COLOR_3DALTFACE 25      /* not present in winuser.h */
+
+WUAPI BOOL
+WuSaveSysColors(
+    IN INT              cElements,
+    IN CONST INT*       lpaElements,
+    IN CONST LPCOLORREF lpaRgbValues
+    );
+
+/***************************************************************************
  *  inputbox.c
  ***************************************************************************/
 
@@ -424,39 +461,6 @@ WuDownloadToMemoryA(
 #else /* UNICODE */
     #define WuDownloadToMemory WuDownloadToMemoryA
 #endif /* UNICODE */
-
-/***************************************************************************
- *  misc.c
- ***************************************************************************/
-
-WUAPI BOOL
-WuBrandingFormatStringW(
-    IN  LPCWSTR szFormat,
-    OUT LPWSTR  szBuffer,
-    IN  ULONG   cchBufferSize
-    );
-
-WUAPI BOOL
-WuBrandingFormatStringA(
-    IN  LPCSTR  szFormat,
-    OUT LPSTR   szBuffer,
-    IN  ULONG   cchBufferSize
-    );
-
-#ifdef UNICODE
-    #define WuBrandingFormatString WuBrandingFormatStringW
-#else /* UNICODE */
-    #define WuBrandingFormatString WuBrandingFormatStringA
-#endif /* UNICODE */
-
-#define COLOR_3DALTFACE 25      /* not present in winuser.h */
-
-WUAPI BOOL
-WuSaveSysColors(
-    IN INT              cElements,
-    IN CONST INT*       lpaElements,
-    IN CONST LPCOLORREF lpaRgbValues
-    );
 
 /***************************************************************************
  *  power.c

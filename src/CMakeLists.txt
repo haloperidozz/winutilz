@@ -23,14 +23,15 @@ target_include_directories(winutilz
 
 target_sources(winutilz
     PRIVATE
+        branding.c
         capture.c
         clipboard.c
+        colors.c
         cursor.c
         image.c
         inputbox.c
         internal.c
         internet.c
-        misc.c
         power.c
         process.c
         resource.c
