@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(winutilz VERSION 1.0.1 LANGUAGES C)
+project(winutilz VERSION 1.0.2 LANGUAGES C)
 
 option(BUILD_SHARED_LIBS       "Build winutilz as a shared library" OFF)
 option(WINUTILZ_INSTALL        "Generate installation target"       ON)
