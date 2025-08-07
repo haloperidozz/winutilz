@@ -177,60 +177,6 @@ WuCreateHBITMAPFromImageData(
     return hBitmap;
 }
 
-WUAPI VOID
-WuImageDataSetPixel(
-    IN PIMAGEDATA   pImageData,
-    IN UINT         x,
-    IN UINT         y,
-    IN COLORREF     color
-    )
-{
-    BYTE* pbPixel = NULL;
-
-    if (pImageData == NULL || pImageData->abData == NULL)
-    {
-        return;
-    }
-
-    if (x >= pImageData->uWidth || y >= pImageData->uHeight)
-    {
-        return;
-    }
-
-   pbPixel = pImageData->abData
-        + ((y * pImageData->uWidth + x) * WU_IMAGEDATA_BYTES_PER_PIXEL);
-
-    pbPixel[0] = GetBValue(color);
-    pbPixel[1] = GetGValue(color);
-    pbPixel[2] = GetRValue(color);
-    pbPixel[3] = GetAValue(color);
-}
-
-WUAPI COLORREF
-WuImageDataGetPixel(
-    IN CONST PIMAGEDATA pImageData,
-    IN UINT             x,
-    IN UINT             y
-    )
-{
-    BYTE* pbPixel = NULL;
-
-    if (pImageData == NULL || pImageData->abData == NULL)
-    {
-        return 0;
-    }
-
-    if (x >= pImageData->uWidth || y >= pImageData->uHeight)
-    {
-        return 0;
-    }
-
-    pbPixel = pImageData->abData
-        + ((y * pImageData->uWidth + x) * WU_IMAGEDATA_BYTES_PER_PIXEL);
-
-    return RGBA(pbPixel[2], pbPixel[1], pbPixel[0], pbPixel[3]);
-}
-
 static CONST GUID*
 ImageFormatToWicContainerGUID(
     IN WU_IMAGE_FORMAT  format

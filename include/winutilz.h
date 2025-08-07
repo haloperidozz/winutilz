@@ -23,6 +23,14 @@
     #define WUAPI __declspec(dllimport)
 #endif
 
+#if defined(_MSC_VER)
+    #define WU_INLINE __inline
+#elif defined(__GNUC__) || defined(__clang__)
+    #define WU_INLINE __inline__
+#else
+    #define WU_INLINE
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -191,21 +199,6 @@ WuCreateHBITMAPFromImageData(
     IN CONST PIMAGEDATA pImageData
     );
 
-WUAPI VOID
-WuImageDataSetPixel(
-    IN PIMAGEDATA   pImageData,
-    IN UINT         x,
-    IN UINT         y,
-    IN COLORREF     color
-    );
-
-WUAPI COLORREF
-WuImageDataGetPixel(
-    IN CONST PIMAGEDATA pImageData,
-    IN UINT             x,
-    IN UINT             y
-    );
-
 typedef enum {
     WU_IMAGE_FORMAT_BMP     = 0x0,
     WU_IMAGE_FORMAT_PNG     = 0x1,
@@ -252,6 +245,60 @@ WUAPI VOID
 WuDestroyImageData(
     IN PIMAGEDATA   pImageData
     );
+
+static WU_INLINE VOID
+WuImageDataSetPixel(
+    IN PIMAGEDATA   pImageData,
+    IN UINT         x,
+    IN UINT         y,
+    IN COLORREF     color
+    )
+{
+    BYTE* pbPixel = NULL;
+
+    if (pImageData == NULL || pImageData->abData == NULL)
+    {
+        return;
+    }
+
+    if (x >= pImageData->uWidth || y >= pImageData->uHeight)
+    {
+        return;
+    }
+
+   pbPixel = pImageData->abData
+        + ((y * pImageData->uWidth + x) * WU_IMAGEDATA_BYTES_PER_PIXEL);
+
+    pbPixel[0] = GetBValue(color);
+    pbPixel[1] = GetGValue(color);
+    pbPixel[2] = GetRValue(color);
+    pbPixel[3] = GetAValue(color);
+}
+
+static WU_INLINE COLORREF
+WuImageDataGetPixel(
+    IN CONST PIMAGEDATA pImageData,
+    IN UINT             x,
+    IN UINT             y
+    )
+{
+    BYTE* pbPixel = NULL;
+
+    if (pImageData == NULL || pImageData->abData == NULL)
+    {
+        return 0;
+    }
+
+    if (x >= pImageData->uWidth || y >= pImageData->uHeight)
+    {
+        return 0;
+    }
+
+    pbPixel = pImageData->abData
+        + ((y * pImageData->uWidth + x) * WU_IMAGEDATA_BYTES_PER_PIXEL);
+
+    return RGBA(pbPixel[2], pbPixel[1], pbPixel[0], pbPixel[3]);
+}
 
 /***************************************************************************
  *  capture.c
@@ -883,15 +930,24 @@ WuSetWallpaperFromUrlA(
     #define WuSetWallpaperFromUrl WuSetWallpaperFromUrlA
 #endif /* UNICODE */
 
-WUAPI BOOL
+static WU_INLINE BOOL
 WuSetWallpaperBackgroundColor(
     IN COLORREF crColor
-    );
+    )
+{
+    INT      aiElements[2] = { COLOR_BACKGROUND, COLOR_DESKTOP };
+    COLORREF  acrValues[2] = { crColor, crColor };
+    
+    return WuSaveSysColors(2, aiElements, acrValues);
+}
 
-WUAPI COLORREF
+static WU_INLINE COLORREF
 WuGetWallpaperBackgroundColor(
     VOID
-    );
+    )
+{
+    return GetSysColor(COLOR_DESKTOP);
+}
 
 /***************************************************************************
  *  window.c

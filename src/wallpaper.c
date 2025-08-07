@@ -316,22 +316,3 @@ WuSetWallpaperFromUrlA(
         (LPVOID) szWallpaperUrl,
         (DWORD) style);
 }
-
-WUAPI BOOL
-WuSetWallpaperBackgroundColor(
-    IN COLORREF crColor
-    )
-{
-    INT      aiElements[2] = { COLOR_BACKGROUND, COLOR_DESKTOP };
-    COLORREF  acrValues[2] = { crColor, crColor };
-    
-    return WuSaveSysColors(2, aiElements, acrValues);
-}
-
-WUAPI COLORREF
-WuGetWallpaperBackgroundColor(
-    VOID
-    )
-{
-    return GetSysColor(COLOR_DESKTOP);
-}
