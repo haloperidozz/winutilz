@@ -163,7 +163,7 @@ WuProcessInjectFunction(
     bResult = WriteProcessMemory(
         hProcess,
         lpRemoteFunction,
-        fnFunction,
+        (LPVOID) fnFunction,
         cbFunction,
         &nWritten);
     
@@ -208,7 +208,7 @@ no_data:
         hProcess,
         NULL,
         0,
-        lpRemoteFunction,
+        (LPTHREAD_START_ROUTINE) lpRemoteFunction,
         lpRemoteParam,
         0,
         NULL);

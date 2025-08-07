@@ -11,33 +11,6 @@
 
 #include "undoc.h"
 
-#define CALL_LAZY_DLL_FUNC(ret_var, dll_name, address, func_type, ...)  \
-    do                                                                  \
-    {                                                                   \
-        static HMODULE   hModule = NULL;                                \
-        static func_type fpFunc  = NULL;                                \
-                                                                        \
-        if (fpFunc == NULL)                                             \
-        {                                                               \
-            if (hModule == NULL)                                        \
-            {                                                           \
-                hModule = LoadLibraryExA(                               \
-                    (dll_name),                                         \
-                    NULL,                                               \
-                    LOAD_LIBRARY_SEARCH_SYSTEM32);                      \
-            }                                                           \
-            if (hModule != NULL)                                        \
-            {                                                           \
-                fpFunc = (func_type) GetProcAddress(                    \
-                    hModule,                                            \
-                    (LPCSTR) address);                                  \
-            }                                                           \
-        }                                                               \
-                                                                        \
-        (ret_var) = (fpFunc ? fpFunc(__VA_ARGS__) : 0);                 \
-    }                                                                   \
-    while (FALSE)
-
 /*
     +-------------------------------------------------------------------+
     |   WINBRAND.DLL                                                    |
@@ -51,16 +24,28 @@ BrandingFormatString(
     IN LPCWSTR  szFormat
     )
 {
-    LPWSTR szFormatResult = NULL;
-
-    CALL_LAZY_DLL_FUNC(
-        szFormatResult,
-        "winbrand.dll",
-        "BrandingFormatString",
-        BrandingFormatStringType,
-        szFormat);
-
-    return szFormatResult;
+    static HMODULE                  hModule = NULL;
+    static BrandingFormatStringType fpFunc  = NULL;
+    
+    if (fpFunc == NULL)
+    {
+        if (hModule == NULL)
+        {
+            hModule = LoadLibraryExA(
+                "winbrand.dll",
+                NULL,
+                LOAD_LIBRARY_SEARCH_SYSTEM32);
+        }
+        
+        if (hModule != NULL)
+        {
+            fpFunc = (BrandingFormatStringType) GetProcAddress(
+                hModule,
+                "BrandingFormatString");
+        }
+    }
+    
+    return (fpFunc != NULL) ? fpFunc(szFormat) : NULL;
 }
 
 /*
@@ -86,19 +71,28 @@ SHCreateWorkerWindowW(
     IN HMENU    hMenu,
     IN LONG_PTR wnd_extra)
 {
-    HWND hWorkerWnd = NULL;
-
-    CALL_LAZY_DLL_FUNC(
-        hWorkerWnd,
-        "shlwapi.dll",
-        278,                            /* ordinal */
-        SHCreateWorkerWindowWType,
-        fnWndProc,
-        hWndParent,
-        dwExStyle,
-        dwStyle,
-        hMenu,
-        wnd_extra);
-
-    return hWorkerWnd;
+    static HMODULE                   hModule = NULL;
+    static SHCreateWorkerWindowWType fpFunc  = NULL;
+    
+    if (fpFunc == NULL)
+    {
+        if (hModule == NULL)
+        {
+            hModule = LoadLibraryExA(
+                "shlwapi.dll",
+                NULL,
+                LOAD_LIBRARY_SEARCH_SYSTEM32);
+        }
+        
+        if (hModule != NULL)
+        {
+            fpFunc = (SHCreateWorkerWindowWType) GetProcAddress(
+                hModule,
+                (LPCSTR) 278 /* ordinal */ );
+        }
+    }
+    
+    return (fpFunc != NULL)
+        ? fpFunc(fnWndProc, hWndParent, dwExStyle, dwStyle, hMenu, wnd_extra)
+        : NULL;
 }

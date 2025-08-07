@@ -118,7 +118,7 @@ DetermineCursorFileType(
     return CURSOR_FILE_TYPE_UNKNOWN;
 }
 
-static inline BOOL
+static WU_INLINE BOOL
 IsValidCursorFile(
     IN LPCWSTR  szFilePath
     )

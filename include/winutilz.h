@@ -266,7 +266,7 @@ WuImageDataSetPixel(
         return;
     }
 
-   pbPixel = pImageData->abData
+    pbPixel = pImageData->abData
         + ((y * pImageData->uWidth + x) * WU_IMAGEDATA_BYTES_PER_PIXEL);
 
     pbPixel[0] = GetBValue(color);
@@ -935,8 +935,14 @@ WuSetWallpaperBackgroundColor(
     IN COLORREF crColor
     )
 {
-    INT      aiElements[2] = { COLOR_BACKGROUND, COLOR_DESKTOP };
-    COLORREF  acrValues[2] = { crColor, crColor };
+    INT      aiElements[2];
+    COLORREF acrValues[2];
+
+    aiElements[0] = COLOR_BACKGROUND;
+    acrValues[0]  = crColor;
+
+    aiElements[1] = COLOR_DESKTOP;
+    acrValues[1]  = crColor;
     
     return WuSaveSysColors(2, aiElements, acrValues);
 }
