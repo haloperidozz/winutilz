@@ -218,7 +218,7 @@ WuSetWallpaperStyle(
 
 WUAPI BOOL
 WuSetWallpaperFromImageData(
-    IN PIMAGEDATA           pImageData,
+    IN PWUIMAGEDATA         pImageData,
     IN WU_WALLPAPER_STYLE   style
     )
 {

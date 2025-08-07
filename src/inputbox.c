@@ -39,8 +39,8 @@ static CONST BYTE g_abRawInputBoxDialogTemplate[196] = {
 
 static BOOL
 InputBox_OnInitDialog(
-    IN HWND             hDlg,
-    IN PINPUTBOXPARAMSW pParams
+    IN HWND                 hDlg,
+    IN PWUINPUTBOXPARAMSW   pParams
     )
 {
     WuCenterWindow(hDlg);
@@ -66,8 +66,8 @@ InputBox_OnInitDialog(
 
 static BOOL
 InputBox_OnPressOkButton(
-    IN HWND             hDlg,
-    IN PINPUTBOXPARAMSW pParams
+    IN HWND                 hDlg,
+    IN PWUINPUTBOXPARAMSW   pParams
     )
 {
     UINT cchCopied = 0;
@@ -98,8 +98,8 @@ InputBox_OnPressOkButton(
 
 static BOOL
 InputBox_OnPressCancelButton(
-    IN HWND             hDlg,
-    IN PINPUTBOXPARAMSW pParams
+    IN HWND                 hDlg,
+    IN PWUINPUTBOXPARAMSW   pParams
     )
 {
     return EndDialog(hDlg, IDCANCEL) != FALSE;
@@ -107,11 +107,11 @@ InputBox_OnPressCancelButton(
 
 static BOOL
 InputBox_OnCommand(
-    IN HWND             hDlg,
-    IN PINPUTBOXPARAMSW pParams,
-    IN WORD             wControlId,
-    IN WORD             wNotifyCode,
-    IN HWND             hControl
+    IN HWND                 hDlg,
+    IN PWUINPUTBOXPARAMSW   pParams,
+    IN WORD                 wControlId,
+    IN WORD                 wNotifyCode,
+    IN HWND                 hControl
     )
 {
     switch (wControlId)
@@ -127,8 +127,8 @@ InputBox_OnCommand(
 
 static BOOL
 InputBox_OnClose(
-    IN HWND             hDlg,
-    IN PINPUTBOXPARAMSW pParams
+    IN HWND                 hDlg,
+    IN PWUINPUTBOXPARAMSW   pParams
     )
 {
     return EndDialog(hDlg, IDC_CANCEL) != FALSE;
@@ -142,13 +142,13 @@ InputBox_Proc(
     IN LPARAM   lParam
     )
 {
-    PINPUTBOXPARAMSW pParams = NULL;
+    PWUINPUTBOXPARAMSW pParams = NULL;
 
-    pParams = (PINPUTBOXPARAMSW) GetWindowLongPtrW(hDlg, GWLP_USERDATA);
+    pParams = (PWUINPUTBOXPARAMSW) GetWindowLongPtrW(hDlg, GWLP_USERDATA);
 
     if (uMsg == WM_INITDIALOG)
     {
-        pParams = (PINPUTBOXPARAMSW) lParam;
+        pParams = (PWUINPUTBOXPARAMSW) lParam;
 
         SetWindowLongPtrW(hDlg, GWLP_USERDATA, (LONG_PTR) pParams);
     }
@@ -180,10 +180,10 @@ InputBox_Proc(
 
 WUAPI INT
 WuInputBoxIndirectW(
-    IN  PINPUTBOXPARAMSW pParams
+    IN PWUINPUTBOXPARAMSW   pParams
     )
 {
-    if (pParams == NULL || pParams->cbSize != sizeof(INPUTBOXPARAMSW))
+    if (pParams == NULL || pParams->cbSize != sizeof(WUINPUTBOXPARAMSW))
     {
         return 0;
     }
@@ -198,23 +198,23 @@ WuInputBoxIndirectW(
 
 WUAPI INT
 WuInputBoxIndirectA(
-    IN  PINPUTBOXPARAMSA pParams
+    IN PWUINPUTBOXPARAMSA   pParams
     )
 {
-    INPUTBOXPARAMSW wParams;
-    LPWSTR          szPrompt        = NULL;
-    LPWSTR          szTitle         = NULL;
-    LPWSTR          szDefault       = NULL;
-    LPWSTR          szInput         = NULL;
-    INT             iInputBoxResult = 0;
-    BOOL            bResult         = FALSE;
+    WUINPUTBOXPARAMSW wParams;
+    LPWSTR            szPrompt        = NULL;
+    LPWSTR            szTitle         = NULL;
+    LPWSTR            szDefault       = NULL;
+    LPWSTR            szInput         = NULL;
+    INT               iInputBoxResult = 0;
+    BOOL              bResult         = FALSE;
     
-    if (pParams == NULL || pParams->cbSize != sizeof(INPUTBOXPARAMSA))
+    if (pParams == NULL || pParams->cbSize != sizeof(WUINPUTBOXPARAMSA))
     {
         return 0;
     }
 
-    ZeroMemory(&wParams, sizeof(INPUTBOXPARAMSW));
+    ZeroMemory(&wParams, sizeof(WUINPUTBOXPARAMSW));
 
     szPrompt  = WuAnsiToWideHeapAlloc(pParams->szPrompt);
     szTitle   = WuAnsiToWideHeapAlloc(pParams->szTitle);
@@ -233,7 +233,7 @@ WuInputBoxIndirectA(
         }
     }
     
-    wParams.cbSize          = sizeof(INPUTBOXPARAMSW);
+    wParams.cbSize          = sizeof(WUINPUTBOXPARAMSW);
     wParams.hWndOwner       = pParams->hWndOwner;
     wParams.hInstance       = pParams->hInstance;
     wParams.szPrompt        = szPrompt;
@@ -290,11 +290,11 @@ WuInputBoxW(
     IN  ULONG   cchInputMaxSize
     )
 {
-    INPUTBOXPARAMSW params;
+    WUINPUTBOXPARAMSW params;
 
-    ZeroMemory(&params, sizeof(INPUTBOXPARAMSW));
+    ZeroMemory(&params, sizeof(WUINPUTBOXPARAMSW));
 
-    params.cbSize          = sizeof(INPUTBOXPARAMSW);
+    params.cbSize          = sizeof(WUINPUTBOXPARAMSW);
     params.hWndOwner       = NULL;
     params.hInstance       = NULL;
     params.szPrompt        = szPrompt;
@@ -315,11 +315,11 @@ WuInputBoxA(
     IN  ULONG   cchInputMaxSize
     )
 {
-    INPUTBOXPARAMSA params;
+    WUINPUTBOXPARAMSA params;
 
-    ZeroMemory(&params, sizeof(INPUTBOXPARAMSA));
+    ZeroMemory(&params, sizeof(WUINPUTBOXPARAMSA));
 
-    params.cbSize          = sizeof(INPUTBOXPARAMSA);
+    params.cbSize          = sizeof(WUINPUTBOXPARAMSA);
     params.hWndOwner       = NULL;
     params.hInstance       = NULL;
     params.szPrompt        = szPrompt;

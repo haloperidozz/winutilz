@@ -16,7 +16,7 @@
 
 #define PW_RENDERFULLCONTENT    0x00000002  /* definition for clang */
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuCaptureScreen(
     VOID
     )
@@ -24,21 +24,21 @@ WuCaptureScreen(
     return WuCaptureWindow(GetDesktopWindow());
 }
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuCaptureWindow(
     IN HWND hWnd
     )
 {
-    RECT       rcWindow;
-    SIZE       windowSize;
-    HDC        hWindowDC  = NULL;
-    HDC        hMemoryDC  = NULL;
-    HBITMAP    hbmCapture = NULL;
-    HBITMAP    hbmOld     = NULL;
-    PIMAGEDATA pImageData = NULL;
-    BOOL       bCaptured  = FALSE;
-    SIZE_T     cbImage    = 0;
-    INT        i          = 0;
+    RECT         rcWindow;
+    SIZE         windowSize;
+    HDC          hWindowDC  = NULL;
+    HDC          hMemoryDC  = NULL;
+    HBITMAP      hbmCapture = NULL;
+    HBITMAP      hbmOld     = NULL;
+    PWUIMAGEDATA pImageData = NULL;
+    BOOL         bCaptured  = FALSE;
+    SIZE_T       cbImage    = 0;
+    INT          i          = 0;
 
     if (hWnd == NULL || IsWindow(hWnd) == FALSE)
     {

@@ -264,7 +264,7 @@ cleanup:
 
 static BOOL
 WuSetClipboardImageData_WorkerProc(
-    IN PIMAGEDATA   pImageData
+    IN PWUIMAGEDATA   pImageData
     )
 {
     BITMAPINFOHEADER bmiHeader;
@@ -326,7 +326,7 @@ WuSetClipboardImageData_WorkerProc(
 
 WUAPI BOOL
 WuSetClipboardImageData(
-    IN PIMAGEDATA   pImageData
+    IN PWUIMAGEDATA pImageData
     )
 {
     if (pImageData == NULL)
@@ -341,11 +341,11 @@ WuSetClipboardImageData(
 
 static BOOL
 WuGetClipboardImageData_WorkerProc(
-    IN PIMAGEDATA*  ppImageData
+    IN PWUIMAGEDATA*    ppImageData
     )
 {
-    HBITMAP    hClipboardData = NULL;
-    PIMAGEDATA pImageData     = NULL;
+    HBITMAP      hClipboardData = NULL;
+    PWUIMAGEDATA pImageData     = NULL;
 
     hClipboardData = (HBITMAP) GetClipboardData(CF_BITMAP);
     
@@ -368,7 +368,7 @@ WuGetClipboardImageData_WorkerProc(
 
 WUAPI BOOL
 WuGetClipboardImageData(
-    IN PIMAGEDATA*  ppImageData
+    IN PWUIMAGEDATA*    ppImageData
     )
 {
     if (ppImageData == NULL)

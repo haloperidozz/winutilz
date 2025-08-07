@@ -177,26 +177,26 @@ WuSetCursorFromUrlA(
 
 #define WU_IMAGEDATA_BYTES_PER_PIXEL    4
 
-typedef struct tagIMAGEDATA {
+typedef struct tagWUIMAGEDATA {
     BYTE*   abData;                 /* BGRA order*/
     UINT    uWidth;
     UINT    uHeight;
-} IMAGEDATA, *PIMAGEDATA;
+} WUIMAGEDATA, *PWUIMAGEDATA;
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuCreateEmptyImageData(
     IN UINT uWidth,
     IN UINT uHeight
     );
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuExtractImageDataFromHBITMAP(
     IN HBITMAP  hBitmap
     );
 
 WUAPI HBITMAP
 WuCreateHBITMAPFromImageData(
-    IN CONST PIMAGEDATA pImageData
+    IN CONST PWUIMAGEDATA   pImageData
     );
 
 typedef enum {
@@ -207,16 +207,16 @@ typedef enum {
 
 WUAPI BOOL
 WuSaveImageDataToFileW(
-    IN CONST PIMAGEDATA pImageData,
-    IN LPCWSTR          szFilePath,
-    IN WU_IMAGE_FORMAT  format
+    IN CONST PWUIMAGEDATA   pImageData,
+    IN LPCWSTR              szFilePath,
+    IN WU_IMAGE_FORMAT      format
     );
 
 WUAPI BOOL
 WuSaveImageDataToFileA(
-    IN CONST PIMAGEDATA pImageData,
-    IN LPCSTR           szFilePath,
-    IN WU_IMAGE_FORMAT  format
+    IN CONST PWUIMAGEDATA   pImageData,
+    IN LPCSTR               szFilePath,
+    IN WU_IMAGE_FORMAT      format
     );
 
 #ifdef UNICODE
@@ -225,12 +225,12 @@ WuSaveImageDataToFileA(
     #define WuSaveImageDataToFile WuSaveImageDataToFileA
 #endif /* UNICODE */
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuLoadImageDataFromFileW(
     IN LPCWSTR  szFilePath
     );
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuLoadImageDataFromFileA(
     IN LPCSTR   szFilePath
     );
@@ -243,12 +243,12 @@ WuLoadImageDataFromFileA(
 
 WUAPI VOID
 WuDestroyImageData(
-    IN PIMAGEDATA   pImageData
+    IN PWUIMAGEDATA pImageData
     );
 
 static WU_INLINE VOID
 WuImageDataSetPixel(
-    IN PIMAGEDATA   pImageData,
+    IN PWUIMAGEDATA pImageData,
     IN UINT         x,
     IN UINT         y,
     IN COLORREF     color
@@ -277,9 +277,9 @@ WuImageDataSetPixel(
 
 static WU_INLINE COLORREF
 WuImageDataGetPixel(
-    IN CONST PIMAGEDATA pImageData,
-    IN UINT             x,
-    IN UINT             y
+    IN CONST PWUIMAGEDATA   pImageData,
+    IN UINT                 x,
+    IN UINT                 y
     )
 {
     BYTE* pbPixel = NULL;
@@ -304,12 +304,12 @@ WuImageDataGetPixel(
  *  capture.c
  ***************************************************************************/
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuCaptureScreen(
     VOID
     );
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuCaptureWindow(
     IN HWND hWnd
     );
@@ -354,12 +354,12 @@ WuGetClipboardTextA(
 
 WUAPI BOOL
 WuSetClipboardImageData(
-    IN PIMAGEDATA   pImageData
+    IN PWUIMAGEDATA pImageData
     );
 
 WUAPI BOOL
 WuGetClipboardImageData(
-    IN PIMAGEDATA*  ppImageData
+    IN PWUIMAGEDATA*    ppImageData
     );
 
 /***************************************************************************
@@ -379,7 +379,7 @@ WuSaveSysColors(
  *  inputbox.c
  ***************************************************************************/
 
-typedef struct tagINPUTBOXPARAMSW {
+typedef struct tagWUINPUTBOXPARAMSW {
     HWND        hWndOwner;
     HINSTANCE   hInstance;
     LPCWSTR     szPrompt;
@@ -388,9 +388,9 @@ typedef struct tagINPUTBOXPARAMSW {
     LPWSTR      szInput;
     ULONG       cchInputMaxSize;
     UINT        cbSize;
-} INPUTBOXPARAMSW, *PINPUTBOXPARAMSW;
+} WUINPUTBOXPARAMSW, *PWUINPUTBOXPARAMSW;
 
-typedef struct tagINPUTBOXPARAMSA {
+typedef struct tagWUINPUTBOXPARAMSA {
     HWND        hWndOwner;
     HINSTANCE   hInstance;
     LPCSTR      szPrompt;
@@ -399,24 +399,24 @@ typedef struct tagINPUTBOXPARAMSA {
     LPSTR       szInput;
     ULONG       cchInputMaxSize;
     UINT        cbSize;
-} INPUTBOXPARAMSA, *PINPUTBOXPARAMSA;
+} WUINPUTBOXPARAMSA, *PWUINPUTBOXPARAMSA;
 
 #ifdef UNICODE
-    #define INPUTBOXPARAMS  INPUTBOXPARAMSW
-    #define PINPUTBOXPARAMS PINPUTBOXPARAMSW
+    #define WUINPUTBOXPARAMS  WUINPUTBOXPARAMSW
+    #define PWUINPUTBOXPARAMS PWUINPUTBOXPARAMSW
 #else /* UNICODE */
-    #define INPUTBOXPARAMS  INPUTBOXPARAMSA
-    #define PINPUTBOXPARAMS PINPUTBOXPARAMSA
+    #define WUINPUTBOXPARAMS  WUINPUTBOXPARAMSA
+    #define PWUINPUTBOXPARAMS PWUINPUTBOXPARAMSA
 #endif /* UNICODE */
 
 WUAPI INT
 WuInputBoxIndirectW(
-    IN  PINPUTBOXPARAMSW pParams
+    IN PWUINPUTBOXPARAMSW   pParams
     );
 
 WUAPI INT
 WuInputBoxIndirectA(
-    IN  PINPUTBOXPARAMSA pParams
+    IN PWUINPUTBOXPARAMSA   pParams
     );
 
 #ifdef UNICODE
@@ -886,7 +886,7 @@ WuSetWallpaperStyle(
 
 WUAPI BOOL
 WuSetWallpaperFromImageData(
-    IN PIMAGEDATA           pImageData,
+    IN PWUIMAGEDATA         pImageData,
     IN WU_WALLPAPER_STYLE   style
     );
 

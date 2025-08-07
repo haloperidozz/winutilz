@@ -27,15 +27,15 @@
         (hComObj) = NULL;                           \
     }
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuCreateEmptyImageData(
     IN UINT uWidth,
     IN UINT uHeight
     )
 {
-    PIMAGEDATA pImageData = NULL;
+    PWUIMAGEDATA pImageData = NULL;
  
-    pImageData = HeapAlloc(GetProcessHeap(), 0, sizeof(IMAGEDATA));
+    pImageData = HeapAlloc(GetProcessHeap(), 0, sizeof(WUIMAGEDATA));
 
     if (pImageData == NULL)
     {
@@ -59,16 +59,16 @@ WuCreateEmptyImageData(
     return pImageData;
 }
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuExtractImageDataFromHBITMAP(
     IN HBITMAP  hBitmap
     )
 {
-    BITMAP     bm;
-    BITMAPINFO bmi;
-    HDC        hDC        = NULL;
-    PIMAGEDATA pImageData = NULL;
-    DWORD      dwLines    = 0;
+    BITMAP       bm;
+    BITMAPINFO   bmi;
+    HDC          hDC        = NULL;
+    PWUIMAGEDATA pImageData = NULL;
+    DWORD        dwLines    = 0;
 
     if (hBitmap == NULL)
     {
@@ -129,7 +129,7 @@ WuExtractImageDataFromHBITMAP(
 
 WUAPI HBITMAP
 WuCreateHBITMAPFromImageData(
-    IN CONST PIMAGEDATA pImageData
+    IN CONST PWUIMAGEDATA   pImageData
     )
 {
     BITMAPINFO bmi;
@@ -197,9 +197,9 @@ ImageFormatToWicContainerGUID(
 
 WUAPI BOOL
 WuSaveImageDataToFileW(
-    IN CONST PIMAGEDATA pImageData,
-    IN LPCWSTR          szFilePath,
-    IN WU_IMAGE_FORMAT  format
+    IN CONST PWUIMAGEDATA   pImageData,
+    IN LPCWSTR              szFilePath,
+    IN WU_IMAGE_FORMAT      format
     )
 {
     WCHAR                  szTempPath[MAX_PATH];
@@ -356,9 +356,9 @@ cleanup:
 
 WUAPI BOOL
 WuSaveImageDataToFileA(
-    IN CONST PIMAGEDATA pImageData,
-    IN LPCSTR           szFilePath,
-    IN WU_IMAGE_FORMAT  format
+    IN CONST PWUIMAGEDATA   pImageData,
+    IN LPCSTR               szFilePath,
+    IN WU_IMAGE_FORMAT      format
     )
 {
     WCHAR szwFilePath[MAX_PATH];
@@ -376,7 +376,7 @@ WuSaveImageDataToFileA(
     return WuSaveImageDataToFileW(pImageData, szwFilePath, format);
 }
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuLoadImageDataFromFileW(
     IN LPCWSTR  szFilePath
     )
@@ -387,7 +387,7 @@ WuLoadImageDataFromFileW(
     IWICBitmapFrameDecode* pWicFrame     = NULL;
     IWICFormatConverter*   pWicConverter = NULL;
     IWICBitmapSource*      pWicBitmapSrc = NULL;
-    PIMAGEDATA             pImageData    = NULL;
+    PWUIMAGEDATA           pImageData    = NULL;
     DWORD                  cchTempPath   = 0;
     UINT                   uWidth        = 0;
     UINT                   uHeight       = 0;
@@ -514,7 +514,7 @@ cleanup:
     return pImageData;
 }
 
-WUAPI PIMAGEDATA
+WUAPI PWUIMAGEDATA
 WuLoadImageDataFromFileA(
     IN LPCSTR   szFilePath
     )
@@ -536,7 +536,7 @@ WuLoadImageDataFromFileA(
 
 WUAPI VOID
 WuDestroyImageData(
-    IN PIMAGEDATA   pImageData
+    IN PWUIMAGEDATA pImageData
     )
 {
     if (pImageData == NULL)
