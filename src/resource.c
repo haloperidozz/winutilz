@@ -107,7 +107,9 @@ WuExtractResourceToFileW(
     LPVOID pResourceData  = NULL;
     ULONG  cbResourceData = 0;
     HANDLE hResourceFile  = INVALID_HANDLE_VALUE;
+    DWORD  cchTempPath    = 0;
     DWORD  dwWritten      = 0;
+    BOOL   bResult        = FALSE;
 
     if (szResourceName == NULL || szResourceType == NULL)
     {
@@ -130,12 +132,19 @@ WuExtractResourceToFileW(
         goto cleanup;
     }
 
-    if (ExpandEnvironmentStringsW(
+    SetLastError(ERROR_SUCCESS);
+
+    cchTempPath = ExpandEnvironmentStringsW(
         szFilePath,
         szTempPath,
-        MAX_PATH) == 0)
+        MAX_PATH);
+
+    if (cchTempPath == 0)
     {
-        goto cleanup;
+        if (GetLastError() != ERROR_SUCCESS)
+        {
+            goto cleanup;
+        }
     }
 
     hResourceFile = CreateFileW(
@@ -152,12 +161,19 @@ WuExtractResourceToFileW(
         goto cleanup;
     }
 
-    WriteFile(
+    bResult = WriteFile(
         hResourceFile,
         pResourceData,
         cbResourceData,
         &dwWritten,
         NULL);
+    
+    if (bResult == FALSE)
+    {
+        goto cleanup;
+    }
+
+    bResult = (dwWritten == cbResourceData);
 
 cleanup:
     if (hResourceFile != INVALID_HANDLE_VALUE)
@@ -165,7 +181,7 @@ cleanup:
         CloseHandle(hResourceFile);
     }
 
-    return dwWritten == cbResourceData;
+    return bResult;
 }
 
 WUAPI BOOL

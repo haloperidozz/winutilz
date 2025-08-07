@@ -132,6 +132,8 @@ WuSetCursorW(
     IN WU_CURSOR_ICON   icon
     )
 {
+    WCHAR   szTempPath[MAX_PATH];
+    DWORD   cchWritten  = 0;
     HKEY    hCursorsKey = NULL;
     LSTATUS lStatus     = STATUS_SUCCESS;
 
@@ -140,7 +142,22 @@ WuSetCursorW(
         return FALSE;
     }
 
-    if (IsValidCursorFile(szCursorPath) == FALSE)
+    SetLastError(ERROR_SUCCESS);
+
+    cchWritten = ExpandEnvironmentStringsW(
+        szCursorPath,
+        szTempPath,
+        MAX_PATH);
+
+    if (cchWritten == 0)
+    {
+        if (GetLastError() != ERROR_SUCCESS)
+        {
+            return FALSE;
+        }
+    }
+
+    if (IsValidCursorFile(szTempPath) == FALSE)
     {
         return FALSE;
     }
@@ -162,8 +179,8 @@ WuSetCursorW(
         g_aszCursorRegistryNames[icon],
         0,
         REG_EXPAND_SZ,
-        (CONST BYTE*) szCursorPath,
-        (lstrlenW(szCursorPath) + 1) * sizeof(WCHAR));
+        (CONST BYTE*) szTempPath,
+        MAX_PATH * sizeof(WCHAR));
     
     if (lStatus != ERROR_SUCCESS)
     {
