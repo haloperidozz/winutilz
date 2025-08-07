@@ -15,12 +15,12 @@ static CONST INT g_aiBayerMatrix4x4[4][4] = {
 
 static inline DOUBLE
 GetColorLuminance(
-    COLORREF crColor
+    WUCOLOR color
     )
 {
-    BYTE r = GetRValue(crColor);
-    BYTE g = GetGValue(crColor);
-    BYTE b = GetBValue(crColor);
+    BYTE r = WuGetColorR(color);
+    BYTE g = WuGetColorG(color);
+    BYTE b = WuGetColorB(color);
 
     /* https://stackoverflow.com/a/596243 */
 
@@ -29,14 +29,14 @@ GetColorLuminance(
 
 static VOID
 ApplyBayerDitheringToImageData(
-    PIMAGEDATA  pImageData
+    PWUIMAGEDATA    pImageData
     )
 {
-    COLORREF crPixel;
-    BYTE     bPixelColor;
-    DOUBLE   dbLuminance;
-    DOUBLE   dbThreshold;
-    UINT     x, y;
+    WUCOLOR pixel;
+    BYTE    bPixelColor;
+    DOUBLE  dbLuminance;
+    DOUBLE  dbThreshold;
+    UINT    x, y;
 
     if (pImageData == NULL || pImageData->abData == NULL)
     {
@@ -47,9 +47,9 @@ ApplyBayerDitheringToImageData(
     {
         for (x = 0; x < pImageData->uWidth; ++x)
         {
-            crPixel = WuImageDataGetPixel(pImageData, x, y);
+            pixel = WuImageDataGetPixel(pImageData, x, y);
 
-            dbLuminance = GetColorLuminance(crPixel);
+            dbLuminance = GetColorLuminance(pixel);
             dbThreshold = g_aiBayerMatrix4x4[y % 4][x % 4] * 255.0 / 16.0;
 
             /* black or white */
@@ -58,7 +58,7 @@ ApplyBayerDitheringToImageData(
             WuImageDataSetPixel(
                 pImageData,
                 x, y,
-                RGB(bPixelColor, bPixelColor, bPixelColor));
+                WU_RGB(bPixelColor, bPixelColor, bPixelColor));
         }
     }
 }
@@ -142,7 +142,7 @@ WinMain(
     )
 {
     WCHAR           szFilePath[MAX_PATH];
-    PIMAGEDATA      pImageData = NULL;
+    PWUIMAGEDATA    pImageData = NULL;
     WU_IMAGE_FORMAT format     = WU_IMAGE_FORMAT_BMP;
 
     ZeroMemory(szFilePath, sizeof(szFilePath));
