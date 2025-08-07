@@ -165,20 +165,25 @@ WuSetCursorFromUrlA(
  *  image.c
  ***************************************************************************/
 
-#undef RGB
+typedef DWORD WUCOLOR;
 
-#define RGBA(r, g, b, a)                                        \
-    ((COLORREF) ((((BYTE)(a)) << 24) | (((BYTE)(b)) << 16) |    \
-                 (((BYTE)(g)) <<  8) | (((BYTE)(r)) <<  0)))
+#define WU_RGBA(r, g, b, a)                                         \
+    ((WUCOLOR) ((((BYTE) (a)) << 24) | (((BYTE) (b)) << 16) |       \
+                (((BYTE) (g)) <<  8) |  ((BYTE) (r))))
 
-#define RGB(r, g, b)    RGBA((r), (g), (b), 0xFF)
+#define WU_RGB(r, g, b) WU_RGBA((r), (g), (b), 0xFF)
 
-#define GetAValue(rgba) LOBYTE((rgba) >> 24)
+#define WuGetColorR(color) LOBYTE((color))
+#define WuGetColorG(color) LOBYTE((color) >>  8)
+#define WuGetColorB(color) LOBYTE((color) >> 16)
+#define WuGetColorA(color) LOBYTE((color) >> 24)
+
+#define WuColorToColorRef(color) ((COLORREF) ((color) & 0x00FFFFFF))
 
 #define WU_IMAGEDATA_BYTES_PER_PIXEL    4
 
 typedef struct tagWUIMAGEDATA {
-    BYTE*   abData;                 /* BGRA order*/
+    BYTE*   abData;                 /* BGRA order */
     UINT    uWidth;
     UINT    uHeight;
 } WUIMAGEDATA, *PWUIMAGEDATA;
@@ -251,7 +256,7 @@ WuImageDataSetPixel(
     IN PWUIMAGEDATA pImageData,
     IN UINT         x,
     IN UINT         y,
-    IN COLORREF     color
+    IN WUCOLOR      color
     )
 {
     BYTE* pbPixel = NULL;
@@ -269,13 +274,13 @@ WuImageDataSetPixel(
     pbPixel = pImageData->abData
         + ((y * pImageData->uWidth + x) * WU_IMAGEDATA_BYTES_PER_PIXEL);
 
-    pbPixel[0] = GetBValue(color);
-    pbPixel[1] = GetGValue(color);
-    pbPixel[2] = GetRValue(color);
-    pbPixel[3] = GetAValue(color);
+    pbPixel[0] = WuGetColorB(color);
+    pbPixel[1] = WuGetColorG(color);
+    pbPixel[2] = WuGetColorR(color);
+    pbPixel[3] = WuGetColorA(color);
 }
 
-static WU_INLINE COLORREF
+static WU_INLINE WUCOLOR
 WuImageDataGetPixel(
     IN CONST PWUIMAGEDATA   pImageData,
     IN UINT                 x,
@@ -297,7 +302,7 @@ WuImageDataGetPixel(
     pbPixel = pImageData->abData
         + ((y * pImageData->uWidth + x) * WU_IMAGEDATA_BYTES_PER_PIXEL);
 
-    return RGBA(pbPixel[2], pbPixel[1], pbPixel[0], pbPixel[3]);
+    return WU_RGBA(pbPixel[2], pbPixel[1], pbPixel[0], pbPixel[3]);
 }
 
 /***************************************************************************
