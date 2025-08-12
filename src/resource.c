@@ -201,3 +201,47 @@ WuExtractResourceToFileA(
     
     return bResult;
 }
+
+WUAPI BOOL
+WuGetStringResourceLength(
+    IN  HINSTANCE   hInstance,
+    IN  UINT        uId,
+    OUT LPDWORD     lpdwSize
+    )
+{
+    LPWSTR lpBlockId     = MAKEINTRESOURCEW((uId >> 4) + 1);
+    LPWSTR lpResType     = MAKEINTRESOURCEW(6); /* RT_STRING */
+    ULONG  ulBlockSize   = 0;
+    UINT   uIndexInBlock = (uId & 0xF);
+    LPWORD lpBlock       = NULL;
+    UINT   i             = 0;
+
+    if (NULL == lpdwSize)
+    {
+        return FALSE;
+    }
+
+    lpBlock = (LPWORD) WuLoadResourceToMemoryW(
+        hInstance,
+        lpBlockId,
+        lpResType,
+        &ulBlockSize);
+
+    if (NULL == lpBlock)
+    {
+        return FALSE;
+    }
+
+/*
+    https://pefile.readthedocs.io/en/latest/usage/ReadingResourceStrings.html
+*/
+
+    for (i = 0; i < uIndexInBlock; ++i)
+    {
+        lpBlock += (1 + *lpBlock); /* |LL|DDDDDDDD...|LL|DDDDDDDDD...| */
+    }
+
+    *lpdwSize = ((DWORD) *lpBlock);
+
+    return TRUE;
+}

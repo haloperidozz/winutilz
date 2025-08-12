@@ -729,6 +729,13 @@ WuExtractResourceToFileA(
     #define WuExtractResourceToFile WuExtractResourceToFileA
 #endif /* UNICODE */
 
+WUAPI BOOL
+WuGetStringResourceLength(
+    IN  HINSTANCE   hInstance,
+    IN  UINT        uId,
+    OUT LPDWORD     lpdwSize
+    );
+
 static WU_INLINE BOOL
 WuResourceExists(
     IN HINSTANCE    hInstance,
