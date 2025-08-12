@@ -685,13 +685,6 @@ WuCurrentProcessGetWindow(
  *  resource.c
  ***************************************************************************/
 
-WUAPI BOOL
-WuResourceExists(
-    IN HINSTANCE    hInstance,
-    IN LPCTSTR      szResourceName,
-    IN LPCTSTR      szResourceType
-    );
-
 WUAPI LPVOID
 WuLoadResourceToMemoryW(
     IN  HINSTANCE   hInstance,
@@ -735,6 +728,16 @@ WuExtractResourceToFileA(
 #else /* UNICODE */
     #define WuExtractResourceToFile WuExtractResourceToFileA
 #endif /* UNICODE */
+
+static WU_INLINE BOOL
+WuResourceExists(
+    IN HINSTANCE    hInstance,
+    IN LPCTSTR      szResourceName,
+    IN LPCTSTR      szResourceType
+    )
+{
+    return (NULL != FindResource(hInstance, szResourceName, szResourceType));
+}
 
 /***************************************************************************
  *  shell.c

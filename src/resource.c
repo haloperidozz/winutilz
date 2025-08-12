@@ -13,17 +13,6 @@
 
 #include "internal.h"
 
-/* TODO: */
-WUAPI BOOL
-WuResourceExists(
-    IN HINSTANCE    hInstance,
-    IN LPCTSTR      szResourceName,
-    IN LPCTSTR      szResourceType
-    )
-{
-    return (NULL != FindResource(hInstance, szResourceName, szResourceType));
-}
-
 WUAPI LPVOID
 WuLoadResourceToMemoryW(
     IN  HINSTANCE   hInstance,
