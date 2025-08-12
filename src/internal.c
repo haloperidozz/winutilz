@@ -21,7 +21,7 @@
 #define CACHE_DIRECTORY_NAME    L"WinUtilzCache"
 
 BOOL
-GetWinUtilzCacheFileName(
+_WuGetWinUtilzCacheFileName(
     IN  LPCWSTR szFileName,
     OUT LPWSTR  szFilePath,
     IN  ULONG   cchFilePath
@@ -77,7 +77,7 @@ GetWinUtilzCacheFileName(
 }
 
 BOOL
-SetSomethingFromResource(
+_WuSetSomethingFromResource(
     IN BOOL             bUnicode,
     IN LPCWSTR          szCacheFileName,
     IN SETFROMFILEPROC  pfnSet,
@@ -109,11 +109,11 @@ SetSomethingFromResource(
     }
     else
     {
-        szwName = AnsiResParamToWideHeapAlloc(szResourceName);
-        szwType = AnsiResParamToWideHeapAlloc(szResourceType);
+        szwName = _WuAnsiResParamToWideHeapAlloc(szResourceName);
+        szwType = _WuAnsiResParamToWideHeapAlloc(szResourceType);
     }
 
-    bResult = GetWinUtilzCacheFileName(
+    bResult = _WuGetWinUtilzCacheFileName(
         szCacheFileName,
         szwTempFile,
         MAX_PATH);
@@ -139,15 +139,15 @@ SetSomethingFromResource(
 cleanup:
     if (FALSE == bUnicode)
     {
-        SafeResParamHeapFree(szwName);
-        SafeResParamHeapFree(szwType);
+        _WuSafeResParamHeapFree(szwName);
+        _WuSafeResParamHeapFree(szwType);
     }
 
     return bResult;
 }
 
 BOOL
-SetSomethingFromUrl(
+_WuSetSomethingFromUrl(
     IN BOOL             bUnicode,
     IN LPCWSTR          szCacheFileName,
     IN SETFROMFILEPROC  pfnSet,
@@ -183,7 +183,7 @@ SetSomethingFromUrl(
         goto cleanup;
     }
 
-    bResult = GetWinUtilzCacheFileName(
+    bResult = _WuGetWinUtilzCacheFileName(
         szCacheFileName,
         szwTempFile,
         MAX_PATH);
@@ -212,7 +212,7 @@ cleanup:
 }
 
 LPWSTR
-AnsiResParamToWideHeapAlloc(
+_WuAnsiResParamToWideHeapAlloc(
     IN LPCSTR   szAnsi
     )
 {
@@ -227,7 +227,7 @@ AnsiResParamToWideHeapAlloc(
 }
 
 VOID
-SafeResParamHeapFree(
+_WuSafeResParamHeapFree(
     IN LPVOID   lpParam
     )
 {
@@ -235,4 +235,30 @@ SafeResParamHeapFree(
     {
         HeapFree(GetProcessHeap(), 0, lpParam);
     }
+}
+
+BOOL
+_WuSafeExpandEnvironmentStringsW(
+    IN  LPCWSTR lpSrc,
+    OUT LPWSTR  lpDst,
+    IN  DWORD   nSize
+    )
+{
+    DWORD cchWritten = 0;
+
+    if ((NULL == lpSrc) || (NULL == lpDst) || (nSize <= 0))
+    {
+        return FALSE;
+    }
+
+    SetLastError(ERROR_SUCCESS);
+
+    cchWritten = ExpandEnvironmentStringsW(lpSrc, lpDst, nSize);
+
+    if ((0 == cchWritten) && (GetLastError() != ERROR_SUCCESS))
+    {
+        return FALSE;
+    }
+
+    return (cchWritten == nSize);
 }

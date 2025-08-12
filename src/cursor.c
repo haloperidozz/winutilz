@@ -135,8 +135,8 @@ WuSetCursorW(
     )
 {
     WCHAR   szTempPath[MAX_PATH];
-    DWORD   cchWritten  = 0;
     HKEY    hCursorsKey = NULL;
+    BOOL    bResult     = FALSE;
     LSTATUS lStatus     = STATUS_SUCCESS;
 
     if ((NULL == szCursorPath) || (icon >= WU_CURSOR_ICON_MAX))
@@ -144,19 +144,14 @@ WuSetCursorW(
         return FALSE;
     }
 
-    SetLastError(ERROR_SUCCESS);
-
-    cchWritten = ExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStringsW(
         szCursorPath,
         szTempPath,
         MAX_PATH);
 
-    if (0 == cchWritten)
+    if (FALSE == bResult)
     {
-        if (GetLastError() != ERROR_SUCCESS)
-        {
-            return FALSE;
-        }
+        return FALSE;
     }
 
     if (IsValidCursorFile(szTempPath) == FALSE)
@@ -232,7 +227,6 @@ WuGetCursorW(
 {
     WCHAR   szTempPath[MAX_PATH];
     HKEY    hCursorsKey = NULL;
-    DWORD   cchWritten  = 0;
     DWORD   cbData      = sizeof(szTempPath);
     LSTATUS lStatus     = STATUS_SUCCESS;
 
@@ -279,22 +273,10 @@ WuGetCursorW(
         return FALSE;
     }
 
-    SetLastError(ERROR_SUCCESS);
-
-    cchWritten = ExpandEnvironmentStringsW(
+    return _WuSafeExpandEnvironmentStringsW(
         szTempPath,
         szCursorPath,
         cchCursorPath);
-
-    if (0 == cchWritten)
-    {
-        if (GetLastError() != ERROR_SUCCESS)
-        {
-            return FALSE;
-        }
-    }
-
-    return (cchWritten <= cchCursorPath);
 }
 
 WUAPI BOOL
@@ -335,7 +317,7 @@ WuSetCursorFromResourceW(
     IN WU_CURSOR_ICON   icon
     )
 {
-    return SetSomethingFromResource(
+    return _WuSetSomethingFromResource(
         TRUE,
         g_aszCursorRegistryNames[icon],
         (SETFROMFILEPROC) WuSetCursorW,
@@ -353,7 +335,7 @@ WuSetCursorFromResourceA(
     IN WU_CURSOR_ICON   icon
     )
 {
-    return SetSomethingFromResource(
+    return _WuSetSomethingFromResource(
         FALSE,
         g_aszCursorRegistryNames[icon],
         (SETFROMFILEPROC) WuSetCursorW,
@@ -369,7 +351,7 @@ WuSetCursorFromUrlW(
     IN WU_CURSOR_ICON   icon
     )
 {
-    return SetSomethingFromUrl(
+    return _WuSetSomethingFromUrl(
         TRUE,
         g_aszCursorRegistryNames[icon],
         (SETFROMFILEPROC) WuSetCursorW,
@@ -383,7 +365,7 @@ WuSetCursorFromUrlA(
     IN WU_CURSOR_ICON   icon
     )
 {
-    return SetSomethingFromUrl(
+    return _WuSetSomethingFromUrl(
         FALSE,
         g_aszCursorRegistryNames[icon],
         (SETFROMFILEPROC) WuSetCursorW,

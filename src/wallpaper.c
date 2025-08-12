@@ -32,8 +32,8 @@ WuSetWallpaperW(
     HKEY    hDesktopKey      = NULL;
     LPCWSTR szWallpaperStyle = NULL;
     LPCWSTR szTileWallpaper  = NULL;
+    BOOL    bResult          = FALSE;
     LSTATUS lStatus          = STATUS_SUCCESS;
-    DWORD   cchTempPath      = 0;
 
     if (NULL == szWallpaperPath)
     {
@@ -119,19 +119,14 @@ WuSetWallpaperW(
         return FALSE;
     }
 
-    SetLastError(ERROR_SUCCESS);
-
-    cchTempPath = ExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStringsW(
         szWallpaperPath,
         szTempPath,
         MAX_PATH);
 
-    if (0 == cchTempPath)
+    if (FALSE == bResult)
     {
-        if (GetLastError() != ERROR_SUCCESS)
-        {
-            return FALSE;
-        }
+        return FALSE;
     }
 
     return SystemParametersInfoW(
@@ -230,7 +225,7 @@ WuSetWallpaperFromImageData(
         return FALSE;
     }
 
-    bResult = GetWinUtilzCacheFileName(
+    bResult = _WuGetWinUtilzCacheFileName(
         CACHE_FILENAME,
         szWallpaperPath,
         MAX_PATH);
@@ -261,7 +256,7 @@ WuSetWallpaperFromResourceW(
     IN WU_WALLPAPER_STYLE   style
     )
 {
-    return SetSomethingFromResource(
+    return _WuSetSomethingFromResource(
         TRUE,
         CACHE_FILENAME,
         (SETFROMFILEPROC) WuSetWallpaperW,
@@ -279,7 +274,7 @@ WuSetWallpaperFromResourceA(
     IN WU_WALLPAPER_STYLE   style
     )
 {
-    return SetSomethingFromResource(
+    return _WuSetSomethingFromResource(
         FALSE,
         CACHE_FILENAME,
         (SETFROMFILEPROC) WuSetWallpaperW,
@@ -295,7 +290,7 @@ WuSetWallpaperFromUrlW(
     IN WU_WALLPAPER_STYLE   style
     )
 {
-    return SetSomethingFromUrl(
+    return _WuSetSomethingFromUrl(
         TRUE,
         CACHE_FILENAME,
         (SETFROMFILEPROC) WuSetWallpaperW,
@@ -309,7 +304,7 @@ WuSetWallpaperFromUrlA(
     IN WU_WALLPAPER_STYLE   style
     )
 {
-    return SetSomethingFromUrl(
+    return _WuSetSomethingFromUrl(
         FALSE,
         CACHE_FILENAME,
         (SETFROMFILEPROC) WuSetWallpaperW,

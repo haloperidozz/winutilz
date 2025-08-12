@@ -70,8 +70,8 @@ WuLoadResourceToMemoryA(
     LPWSTR szwResourceType = NULL;
     LPVOID lpResourceData  = NULL;
 
-    szwResourceName = AnsiResParamToWideHeapAlloc(szResourceName);
-    szwResourceType = AnsiResParamToWideHeapAlloc(szResourceType);
+    szwResourceName = _WuAnsiResParamToWideHeapAlloc(szResourceName);
+    szwResourceType = _WuAnsiResParamToWideHeapAlloc(szResourceType);
 
     lpResourceData = WuLoadResourceToMemoryW(
         hInstance,
@@ -79,8 +79,8 @@ WuLoadResourceToMemoryA(
         szwResourceType,
         pcbSize);
     
-    SafeResParamHeapFree(szwResourceName);
-    SafeResParamHeapFree(szwResourceType);
+    _WuSafeResParamHeapFree(szwResourceName);
+    _WuSafeResParamHeapFree(szwResourceType);
     
     return lpResourceData;
 }
@@ -97,7 +97,6 @@ WuExtractResourceToFileW(
     LPVOID pResourceData  = NULL;
     ULONG  cbResourceData = 0;
     HANDLE hResourceFile  = INVALID_HANDLE_VALUE;
-    DWORD  cchTempPath    = 0;
     DWORD  dwWritten      = 0;
     BOOL   bResult        = FALSE;
 
@@ -121,20 +120,15 @@ WuExtractResourceToFileW(
     {
         goto cleanup;
     }
-
-    SetLastError(ERROR_SUCCESS);
-
-    cchTempPath = ExpandEnvironmentStringsW(
+    
+    bResult = _WuSafeExpandEnvironmentStringsW(
         szFilePath,
         szTempPath,
         MAX_PATH);
 
-    if (0 == cchTempPath)
+    if (FALSE == bResult)
     {
-        if (GetLastError() != ERROR_SUCCESS)
-        {
-            goto cleanup;
-        }
+        goto cleanup;
     }
 
     hResourceFile = CreateFileW(
@@ -187,8 +181,8 @@ WuExtractResourceToFileA(
     LPWSTR szwFilePath     = NULL;
     BOOL   bResult         = FALSE;
 
-    szwResourceName = AnsiResParamToWideHeapAlloc(szResourceName);
-    szwResourceType = AnsiResParamToWideHeapAlloc(szResourceType);
+    szwResourceName = _WuAnsiResParamToWideHeapAlloc(szResourceName);
+    szwResourceType = _WuAnsiResParamToWideHeapAlloc(szResourceType);
     szwFilePath     = WuAnsiToWideHeapAlloc(szFilePath);
 
     bResult = WuExtractResourceToFileW(
@@ -202,8 +196,8 @@ WuExtractResourceToFileA(
         HeapFree(GetProcessHeap(), 0, szwFilePath);
     }
     
-    SafeResParamHeapFree(szwResourceName);
-    SafeResParamHeapFree(szwResourceType);
+    _WuSafeResParamHeapFree(szwResourceName);
+    _WuSafeResParamHeapFree(szwResourceType);
     
     return bResult;
 }

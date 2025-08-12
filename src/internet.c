@@ -14,6 +14,7 @@
 #include <wininet.h>    /* TODO: WinHTTP? */
 
 #include "version.h"
+#include "internal.h"
 
 #define USER_AGENT  L"WinUtilz/" PROJECT_VERSION_W
 
@@ -145,7 +146,6 @@ WuDownloadFileW(
     )
 {
     WCHAR  szDestPathTemp[MAX_PATH];
-    DWORD  cchTempPath = 0;
     HANDLE hOutputFile = INVALID_HANDLE_VALUE;
     BOOL   bResult     = FALSE;
 
@@ -154,19 +154,14 @@ WuDownloadFileW(
         return FALSE;
     }
 
-    SetLastError(ERROR_SUCCESS);
-
-    cchTempPath = ExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStringsW(
         szDestPath,
         szDestPathTemp,
         MAX_PATH);
 
-    if (0 == cchTempPath)
+    if (FALSE == bResult)
     {
-        if (GetLastError() != ERROR_SUCCESS)
-        {
-            return FALSE;
-        }
+        return FALSE;
     }
 
     hOutputFile = CreateFileW(

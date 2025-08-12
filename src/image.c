@@ -14,6 +14,8 @@
 #include <versionhelpers.h>
 #include <wincodec.h>
 
+#include "internal.h"
+
 #define CLEANUP_IF_FAILED(hResult)                  \
     if (FAILED(hResult))                            \
     {                                               \
@@ -205,7 +207,7 @@ WuSaveImageDataToFileW(
     IWICBitmapFrameEncode* pWicFrame   = NULL;
     IStream*               pStream     = NULL;
     CONST GUID*            pGuidFormat = NULL;
-    DWORD                  cchTempPath = 0;
+    BOOL                   bResult     = FALSE;
     BOOL                   bNeedUninit = FALSE; 
     HRESULT                hResult     = S_OK;
 
@@ -247,19 +249,14 @@ WuSaveImageDataToFileW(
 
     CLEANUP_IF_FAILED(hResult);
 
-    SetLastError(ERROR_SUCCESS);
-
-    cchTempPath = ExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStringsW(
         szFilePath,
         szTempPath,
         MAX_PATH);
 
-    if (0 == cchTempPath)
+    if (FALSE == bResult)
     {
-        if (GetLastError() != ERROR_SUCCESS)
-        {
-            goto cleanup;
-        }
+        goto cleanup;
     }
 
     hResult = pWicStream->lpVtbl->InitializeFromFilename(
@@ -381,9 +378,9 @@ WuLoadImageDataFromFileW(
     IWICFormatConverter*   pWicConverter = NULL;
     IWICBitmapSource*      pWicBitmapSrc = NULL;
     PWUIMAGEDATA           pImageData    = NULL;
-    DWORD                  cchTempPath   = 0;
     UINT                   uWidth        = 0;
     UINT                   uHeight       = 0;
+    BOOL                   bResult       = FALSE;
     BOOL                   bNeedUninit   = FALSE; 
     HRESULT                hResult       = S_OK;
 
@@ -416,19 +413,14 @@ WuLoadImageDataFromFileW(
 
     CLEANUP_IF_FAILED(hResult);
 
-    SetLastError(ERROR_SUCCESS);
-
-    cchTempPath = ExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStringsW(
         szFilePath,
         szTempPath,
         MAX_PATH);
 
-    if (0 == cchTempPath)
+    if (FALSE == bResult)
     {
-        if (GetLastError() != ERROR_SUCCESS)
-        {
-            goto cleanup;
-        }
+        goto cleanup;
     }
 
     hResult = pWicFactory->lpVtbl->CreateDecoderFromFilename(

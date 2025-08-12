@@ -17,14 +17,14 @@
 typedef BOOL (*SETFROMFILEPROC)(LPCWSTR, DWORD);
 
 BOOL
-GetWinUtilzCacheFileName(
+_WuGetWinUtilzCacheFileName(
     IN  LPCWSTR szFileName,
     OUT LPWSTR  szFilePath,
     IN  ULONG   cchFilePath
     );
 
 BOOL
-SetSomethingFromResource(
+_WuSetSomethingFromResource(
     IN BOOL             bUnicode,
     IN LPCWSTR          szCacheFileName,
     IN SETFROMFILEPROC  pfnSet,
@@ -35,7 +35,7 @@ SetSomethingFromResource(
     );
 
 BOOL
-SetSomethingFromUrl(
+_WuSetSomethingFromUrl(
     IN BOOL             bUnicode,
     IN LPCWSTR          szCacheFileName,
     IN SETFROMFILEPROC  pfnSet,
@@ -44,13 +44,20 @@ SetSomethingFromUrl(
     );
 
 LPWSTR
-AnsiResParamToWideHeapAlloc(
+_WuAnsiResParamToWideHeapAlloc(
     IN LPCSTR   szAnsi
     );
 
 VOID
-SafeResParamHeapFree(
+_WuSafeResParamHeapFree(
     IN LPVOID   lpParam
+    );
+
+BOOL
+_WuSafeExpandEnvironmentStringsW(
+    IN  LPCWSTR lpSrc,
+    OUT LPWSTR  lpDst,
+    IN  DWORD   nSize
     );
 
 #endif /* INTERNAL_H_INCLUDED */
