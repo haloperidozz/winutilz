@@ -822,6 +822,44 @@ WuWideToAnsiHeapAlloc(
  *  version.c
  ***************************************************************************/
 
+typedef struct tagWUVERSIONW {
+    LPCWSTR szVersion;
+    UINT    uVersionMajor;
+    UINT    uVersionMinor;
+    UINT    uVersionPatch;
+} WUVERSIONW, *PWUVERSIONW;
+
+typedef struct tagWUVERSIONA {
+    LPCSTR  szVersion;
+    UINT    uVersionMajor;
+    UINT    uVersionMinor;
+    UINT    uVersionPatch;
+} WUVERSIONA, *PWUVERSIONA;
+
+#ifdef UNICODE
+    #define WUVERSION   WUVERSIONW
+    #define PWUVERSION  PWUVERSIONW
+#else /* UNICODE */
+    #define WUVERSION   WUVERSIONA
+    #define PWUVERSION  PWUVERSIONA
+#endif /* UNICODE */
+
+WUAPI CONST PWUVERSIONW
+WuGetVersionExW(
+    LPVOID  lpReserved
+    );
+
+WUAPI CONST PWUVERSIONA
+WuGetVersionExA(
+    LPVOID  lpReserved
+    );
+
+#ifdef UNICODE
+    #define WuGetVersionEx WuGetVersionExW
+#else /* UNICODE */
+    #define WuGetVersionEx WuGetVersionExA
+#endif /* UNICODE */
+
 WUAPI LPCWSTR
 WuGetVersionW(
     VOID

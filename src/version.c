@@ -13,12 +13,38 @@
 
 #include "version.h"
 
+#define INIT_WUVERSION(verstr) {        \
+        (verstr),                       \
+        PROJECT_VERSION_MAJOR,          \
+        PROJECT_VERSION_MINOR,          \
+        PROJECT_VERSION_PATCH           \
+    }
+
+static WUVERSIONA g_wuVersionA = INIT_WUVERSION(PROJECT_VERSION_A);
+static WUVERSIONW g_wuVersionW = INIT_WUVERSION(PROJECT_VERSION_W);
+
+WUAPI CONST PWUVERSIONW
+WuGetVersionExW(
+    LPVOID  lpReserved
+    )
+{
+    return &g_wuVersionW;
+}
+
+WUAPI CONST PWUVERSIONA
+WuGetVersionExA(
+    LPVOID  lpReserved
+    )
+{
+    return &g_wuVersionA;
+}
+
 WUAPI LPCWSTR
 WuGetVersionW(
     VOID
     )
 {
-    return PROJECT_VERSION_W;
+    return g_wuVersionW.szVersion;
 }
 
 WUAPI LPCSTR
@@ -26,5 +52,5 @@ WuGetVersionA(
     VOID
     )
 {
-    return PROJECT_VERSION_A;
+    return g_wuVersionA.szVersion;
 }
