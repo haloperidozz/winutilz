@@ -112,7 +112,7 @@ DefViewSendCommandId(
 }
 
 WUAPI HWND
-WuGetDektopListView(
+WuGetDesktopListView(
     VOID
     )
 {
@@ -159,7 +159,7 @@ WuDesktopAreIconsArrangedByGrid(
     VOID
     )
 {
-    HWND  hListView = WuGetDektopListView();
+    HWND  hListView = WuGetDesktopListView();
     DWORD dwExStyle = 0;
 
     if (hListView == NULL)

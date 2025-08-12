@@ -731,9 +731,9 @@ WuExtractResourceToFileA(
     );
 
 #ifdef UNICODE
-    #define WuExtractResourceToFile WuSaveResourceToFileW
+    #define WuExtractResourceToFile WuExtractResourceToFileW
 #else /* UNICODE */
-    #define WuExtractResourceToFile WuSaveResourceToFileA
+    #define WuExtractResourceToFile WuExtractResourceToFileA
 #endif /* UNICODE */
 
 /***************************************************************************
@@ -746,7 +746,7 @@ WuGetDesktopDefViewWindow(
     );
 
 WUAPI HWND
-WuGetDektopListView(
+WuGetDesktopListView(
     VOID
     );
 
