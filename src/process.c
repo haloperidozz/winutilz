@@ -52,7 +52,7 @@ ActOnProcessById(
     
     hProcess = OpenProcess(dwDesiredAccess, FALSE, dwProcessId);
 
-    if (hProcess == NULL)
+    if (NULL == hProcess)
     {
         return FALSE;
     }
@@ -143,7 +143,7 @@ WuProcessInjectFunction(
     HANDLE hRemoteThread    = INVALID_HANDLE_VALUE;
     BOOL   bResult          = FALSE;
 
-    if (hProcess == NULL || fnFunction == NULL || cbFunction == 0)
+    if ((NULL == hProcess) || (NULL == fnFunction) || (0 == cbFunction))
     {
         return FALSE;
     }
@@ -155,7 +155,7 @@ WuProcessInjectFunction(
         MEM_COMMIT | MEM_RESERVE,
         PAGE_EXECUTE_READWRITE);
 
-    if (lpRemoteFunction == NULL)
+    if (NULL == lpRemoteFunction)
     {
         return FALSE;
     }
@@ -167,13 +167,13 @@ WuProcessInjectFunction(
         cbFunction,
         &nWritten);
     
-    if (bResult == FALSE || nWritten < cbFunction)
+    if ((FALSE == bResult) || (nWritten < cbFunction))
     {
         bResult = FALSE;
         goto cleanup;
     }
 
-    if (lpUserData == NULL || cbUserData == 0)
+    if ((NULL == lpUserData) || (cbUserData == 0))
     {
         goto no_data;
     }
@@ -185,7 +185,7 @@ WuProcessInjectFunction(
         MEM_COMMIT,
         PAGE_READWRITE);
     
-    if (lpRemoteParam == NULL)
+    if (NULL == lpRemoteParam)
     {
         goto cleanup;
     }
@@ -197,7 +197,7 @@ WuProcessInjectFunction(
         cbUserData,
         &nWritten);
     
-    if (bResult == FALSE || nWritten < cbFunction)
+    if ((FALSE == bResult) || (nWritten < cbFunction))
     {
         bResult = FALSE;
         goto cleanup;
@@ -213,7 +213,7 @@ no_data:
         0,
         NULL);
     
-    if (hRemoteThread == NULL || hRemoteThread == INVALID_HANDLE_VALUE)
+    if ((NULL == hRemoteThread) || (INVALID_HANDLE_VALUE == hRemoteThread))
     {
         bResult = FALSE;
         goto cleanup;
@@ -241,7 +241,7 @@ cleanup:
         VirtualFreeEx(hProcess, lpRemoteFunction, 0, MEM_RELEASE);
     }
 
-    if (hRemoteThread != NULL && hRemoteThread != INVALID_HANDLE_VALUE)
+    if ((hRemoteThread != NULL) && (hRemoteThread != INVALID_HANDLE_VALUE))
     {
         CloseHandle(hRemoteThread);
     }
@@ -263,7 +263,7 @@ WuProcessInjectFunctionByPid(
     
     hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
 
-    if (hProcess == NULL)
+    if (NULL == hProcess)
     {
         return FALSE;
     }
@@ -293,7 +293,7 @@ WuRunCommandW(
     LPWSTR              szCommandCopy = NULL;
     BOOL                bResult       = FALSE;
 
-    if (szCommand == NULL)
+    if (NULL == szCommand)
     {
         return FALSE;
     }
@@ -305,7 +305,7 @@ WuRunCommandW(
         HEAP_ZERO_MEMORY,
         cchCommand * sizeof(WCHAR));
 
-    if (szCommandCopy == NULL)
+    if (NULL == szCommandCopy)
     {
         goto cleanup;
     }
@@ -317,7 +317,7 @@ WuRunCommandW(
 
     si.cb = sizeof(STARTUPINFOW);
     
-    if (bSilent == TRUE)
+    if (TRUE == bSilent)
     {
         si.dwFlags |= STARTF_USESHOWWINDOW;
         si.wShowWindow = SW_HIDE;
@@ -335,14 +335,14 @@ WuRunCommandW(
         &si,                                /* lpStartupInfo        */
         &pi);                               /* lpProcessInformation */
 
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         goto cleanup;
     }
 
     WaitForSingleObject(pi.hProcess, INFINITE);
 
-    if (lpdwExitCode == NULL)
+    if (NULL == lpdwExitCode)
     {
         goto cleanup;
     }
@@ -383,7 +383,7 @@ WuRunCommandA(
 
     szwCommand = WuAnsiToWideHeapAlloc(szCommand);
 
-    if (szwCommand == NULL)
+    if (NULL == szwCommand)
     {
         return FALSE;
     }

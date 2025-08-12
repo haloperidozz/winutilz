@@ -21,11 +21,19 @@
     }
 
 #define SAFE_RELEASE_COM_OBJECT(hComObj)            \
-    if ((hComObj) != NULL)                          \
+    if (NULL != (hComObj))                          \
     {                                               \
         (hComObj)->lpVtbl->Release(hComObj);        \
         (hComObj) = NULL;                           \
     }
+
+#define WU_IMAGE_FORMAT_MAX 3
+
+static CONST GUID* g_aImageFormatToWicGuid[WU_IMAGE_FORMAT_MAX] = {
+    &GUID_ContainerFormatBmp,   /* WU_IMAGE_FORMAT_BMP  */
+    &GUID_ContainerFormatPng,   /* WU_IMAGE_FORMAT_PNG  */
+    &GUID_ContainerFormatJpeg   /* WU_IMAGE_FORMAT_JPEG */
+};
 
 WUAPI PWUIMAGEDATA
 WuCreateEmptyImageData(
@@ -34,10 +42,15 @@ WuCreateEmptyImageData(
     )
 {
     PWUIMAGEDATA pImageData = NULL;
+
+    if ((uWidth == 0) || (uHeight == 0))
+    {
+        return NULL;
+    }
  
     pImageData = HeapAlloc(GetProcessHeap(), 0, sizeof(WUIMAGEDATA));
 
-    if (pImageData == NULL)
+    if (NULL == pImageData)
     {
         return NULL;
     }
@@ -50,7 +63,7 @@ WuCreateEmptyImageData(
         HEAP_ZERO_MEMORY,
         uWidth * uHeight * WU_IMAGEDATA_BYTES_PER_PIXEL);
     
-    if (pImageData->abData == NULL)
+    if (NULL == pImageData->abData)
     {
         HeapFree(GetProcessHeap(), 0, pImageData);
         return NULL;
@@ -70,7 +83,7 @@ WuExtractImageDataFromHBITMAP(
     PWUIMAGEDATA pImageData = NULL;
     DWORD        dwLines    = 0;
 
-    if (hBitmap == NULL)
+    if (NULL == hBitmap)
     {
         return NULL;
     }
@@ -84,14 +97,14 @@ WuExtractImageDataFromHBITMAP(
 
     pImageData = WuCreateEmptyImageData(bm.bmWidth, bm.bmHeight);
 
-    if (pImageData == NULL)
+    if (NULL == pImageData)
     {
         return NULL;
     }
 
     hDC = GetDC(NULL);
 
-    if (hDC == NULL)
+    if (NULL == hDC)
     {
         WuDestroyImageData(pImageData);
         return NULL;
@@ -115,7 +128,7 @@ WuExtractImageDataFromHBITMAP(
         &bmi,
         DIB_RGB_COLORS);
 
-    if (dwLines == 0 || dwLines == ERROR_INVALID_PARAMETER)
+    if ((0 == dwLines) || (ERROR_INVALID_PARAMETER == dwLines))
     {
         ReleaseDC(NULL, hDC);
         WuDestroyImageData(pImageData);
@@ -138,14 +151,14 @@ WuCreateHBITMAPFromImageData(
     VOID*      pBits   = NULL;
     SIZE_T     cbImage = 0;
 
-    if (pImageData == NULL)
+    if (NULL == pImageData)
     {
         return NULL;
     }
 
     hDC = GetDC(NULL);
 
-    if (hDC == NULL)
+    if (NULL == hDC)
     {
         return NULL;
     }
@@ -161,7 +174,7 @@ WuCreateHBITMAPFromImageData(
 
     hBitmap = CreateDIBSection(hDC, &bmi, DIB_RGB_COLORS, &pBits, NULL, 0);
 
-    if (hBitmap == NULL || pBits == NULL)
+    if ((NULL == hBitmap) || (NULL == pBits))
     {
         ReleaseDC(NULL, hDC);
         return NULL;
@@ -175,24 +188,6 @@ WuCreateHBITMAPFromImageData(
     ReleaseDC(NULL, hDC);
 
     return hBitmap;
-}
-
-static CONST GUID*
-ImageFormatToWicContainerGUID(
-    IN WU_IMAGE_FORMAT  format
-    )
-{
-    switch (format)
-    {
-        case WU_IMAGE_FORMAT_BMP:
-            return &GUID_ContainerFormatBmp;
-        case WU_IMAGE_FORMAT_PNG:
-            return &GUID_ContainerFormatPng;
-        case WU_IMAGE_FORMAT_JPEG:
-            return &GUID_ContainerFormatJpeg;
-    }
-
-    return NULL;
 }
 
 WUAPI BOOL
@@ -214,7 +209,12 @@ WuSaveImageDataToFileW(
     BOOL                   bNeedUninit = FALSE; 
     HRESULT                hResult     = S_OK;
 
-    if (pImageData == NULL || szFilePath == NULL)
+    if ((NULL == pImageData) || (NULL == szFilePath))
+    {
+        return FALSE;
+    }
+
+    if (format >= WU_IMAGE_FORMAT_MAX)
     {
         return FALSE;
     }
@@ -254,7 +254,7 @@ WuSaveImageDataToFileW(
         szTempPath,
         MAX_PATH);
 
-    if (cchTempPath == 0)
+    if (0 == cchTempPath)
     {
         if (GetLastError() != ERROR_SUCCESS)
         {
@@ -269,16 +269,9 @@ WuSaveImageDataToFileW(
     
     CLEANUP_IF_FAILED(hResult);
 
-    pGuidFormat = ImageFormatToWicContainerGUID(format);
-
-    if (pGuidFormat == NULL)
-    {
-        goto cleanup;
-    }
-
     hResult = pWicFactory->lpVtbl->CreateEncoder(
         pWicFactory,
-        pGuidFormat,
+        g_aImageFormatToWicGuid[format],
         NULL,
         &pWicEncoder);
 
@@ -346,7 +339,7 @@ cleanup:
     SAFE_RELEASE_COM_OBJECT(pWicStream);
     SAFE_RELEASE_COM_OBJECT(pWicFactory);
 
-    if (bNeedUninit == TRUE)
+    if (TRUE == bNeedUninit)
     {
         CoUninitialize();
     }
@@ -363,7 +356,7 @@ WuSaveImageDataToFileA(
 {
     WCHAR szwFilePath[MAX_PATH];
 
-    if (pImageData == NULL || szFilePath == NULL)
+    if ((NULL == pImageData) || (NULL == szFilePath))
     {
         return FALSE;
     }
@@ -394,7 +387,7 @@ WuLoadImageDataFromFileW(
     BOOL                   bNeedUninit   = FALSE; 
     HRESULT                hResult       = S_OK;
 
-    if (szFilePath == NULL)
+    if (NULL == szFilePath)
     {
         return FALSE;
     }
@@ -407,7 +400,7 @@ WuLoadImageDataFromFileW(
 
     hResult = CoInitialize(NULL);
 
-    bNeedUninit = SUCCEEDED(hResult) && (hResult == S_OK);
+    bNeedUninit = (SUCCEEDED(hResult) && (hResult == S_OK));
 
     if (FAILED(hResult))
     {
@@ -430,7 +423,7 @@ WuLoadImageDataFromFileW(
         szTempPath,
         MAX_PATH);
 
-    if (cchTempPath == 0)
+    if (0 == cchTempPath)
     {
         if (GetLastError() != ERROR_SUCCESS)
         {
@@ -458,7 +451,7 @@ WuLoadImageDataFromFileW(
 
     pImageData = WuCreateEmptyImageData(uWidth, uHeight);
 
-    if (pImageData == NULL)
+    if (NULL == pImageData)
     {
         goto cleanup;
     }
@@ -496,7 +489,7 @@ WuLoadImageDataFromFileW(
         pImageData->abData);
 
 cleanup:
-    if (pImageData != NULL && FAILED(hResult))
+    if ((pImageData != NULL) && FAILED(hResult))
     {
         WuDestroyImageData(pImageData);
     }
@@ -521,7 +514,7 @@ WuLoadImageDataFromFileA(
 {
     WCHAR szwFilePath[MAX_PATH];
 
-    if (szFilePath == NULL)
+    if (NULL == szFilePath)
     {
         return FALSE;
     }
@@ -539,7 +532,7 @@ WuDestroyImageData(
     IN PWUIMAGEDATA pImageData
     )
 {
-    if (pImageData == NULL)
+    if (NULL == pImageData)
     {
         return;
     }

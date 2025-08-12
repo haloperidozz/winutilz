@@ -28,23 +28,24 @@ WithOpenedClipboard(
 {
     HWND hWnd            = NULL;
     BOOL bIsWorkerWindow = FALSE;
+    BOOL bOpened         = FALSE;
     INT  i               = 0;
     BOOL bResult         = FALSE;
 
-    if (fnClipboardWorker == NULL)
+    if (NULL == fnClipboardWorker)
     {
         return FALSE;
     }
 
     hWnd = WuCurrentProcessGetWindow();
 
-    if (hWnd == NULL)
+    if (NULL == hWnd)
     {
         hWnd = SHCreateWorkerWindowW(NULL, NULL, 0, 0, NULL, 0);
         bIsWorkerWindow = TRUE;
     }
 
-    if (hWnd == NULL)
+    if (NULL == hWnd)
     {
         return FALSE;
     }
@@ -53,20 +54,20 @@ WithOpenedClipboard(
     {
         if (OpenClipboard(hWnd) == TRUE)
         {
-            goto opened;
+            bOpened = TRUE;
+            break;
         }
 
         Sleep(CLIPBOARD_RETRY_DELAY_MS);
     }
 
-    return FALSE;
+    if (TRUE == bOpened)
+    {
+        bResult = fnClipboardWorker(lpUserData);
+        CloseClipboard();
+    }
 
-opened:
-    bResult = fnClipboardWorker(lpUserData);
-
-    CloseClipboard();
-
-    if (bIsWorkerWindow == TRUE)
+    if (TRUE == bIsWorkerWindow)
     {
         DestroyWindow(hWnd);
     }
@@ -83,18 +84,23 @@ WuSetClipboardTextW_WorkerProc(
     SIZE_T  cbClipboardText = 0;
     LPWSTR  szClipboardData = NULL;
 
+    if (NULL == szClipboardText)
+    {
+        return FALSE;
+    }
+
     cbClipboardText = (lstrlenW(szClipboardText) + 1) * sizeof(WCHAR);
 
     hClipboardData = GlobalAlloc(GMEM_MOVEABLE, cbClipboardText);
 
-    if (hClipboardData == NULL)
+    if (NULL == hClipboardData)
     {
         return FALSE;
     }
 
     szClipboardData = (LPWSTR) GlobalLock(hClipboardData);
     
-    if (szClipboardData == NULL)
+    if (NULL == szClipboardData)
     {
         GlobalFree(hClipboardData);
         return FALSE;
@@ -124,7 +130,7 @@ WuSetClipboardTextW(
     IN LPCWSTR  szClipboardText
     )
 {
-    if (szClipboardText == NULL)
+    if (NULL == szClipboardText)
     {
         return FALSE;
     }
@@ -144,7 +150,7 @@ WuSetClipboardTextA(
 
     szwClipboardText = WuAnsiToWideHeapAlloc(szClipboardText);
 
-    if (szwClipboardText == NULL)
+    if (NULL == szwClipboardText)
     {
         return FALSE;
     }
@@ -170,16 +176,21 @@ WuGetClipboardTextW_WorkerProc(
     LPCWSTR szClipboardData = NULL;
     HRESULT hResult         = S_OK;
 
+    if (NULL == pClipboardText)
+    {
+        return FALSE;
+    }
+
     hClipboardData = GetClipboardData(CF_UNICODETEXT);
     
-    if (hClipboardData == NULL)
+    if (NULL == hClipboardData)
     {
         return FALSE;
     }
 
     szClipboardData = (LPCWSTR) GlobalLock(hClipboardData);
 
-    if (szClipboardData == NULL)
+    if (NULL == szClipboardData)
     {
         return FALSE;
     }
@@ -202,7 +213,7 @@ WuGetClipboardTextW(
 {
     CLIPBOARDTEXT clipboardText;
 
-    if (szClipboardText == NULL || cchClipboardText == 0)
+    if ((NULL == szClipboardText) || (0 == cchClipboardText))
     {
         return FALSE;
     }
@@ -234,7 +245,7 @@ WuGetClipboardTextA(
         HEAP_ZERO_MEMORY,
         cchClipboardText * sizeof(WCHAR));
 
-    if (szwClipboardText == NULL)
+    if (NULL == szwClipboardText)
     {
         return FALSE;
     }
@@ -243,7 +254,7 @@ WuGetClipboardTextA(
         szwClipboardText,
         cchClipboardText);
 
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         goto cleanup;
     }
@@ -272,6 +283,11 @@ WuSetClipboardImageData_WorkerProc(
     HGLOBAL          hClipboardData = NULL;
     BYTE*            pClipboardData = NULL;
 
+    if (NULL == pImageData)
+    {
+        return FALSE;
+    }
+
     ZeroMemory(&bmiHeader, sizeof(BITMAPINFOHEADER));
 
     bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
@@ -287,14 +303,14 @@ WuSetClipboardImageData_WorkerProc(
 
     hClipboardData = GlobalAlloc(GMEM_MOVEABLE, cbDibSize);
 
-    if (hClipboardData == NULL)
+    if (NULL == hClipboardData)
     {
         return FALSE;
     }
 
     pClipboardData = (BYTE*) GlobalLock(hClipboardData);
     
-    if (pClipboardData == NULL)
+    if (NULL == pClipboardData)
     {
         GlobalFree(hClipboardData);
         return FALSE;
@@ -329,7 +345,7 @@ WuSetClipboardImageData(
     IN PWUIMAGEDATA pImageData
     )
 {
-    if (pImageData == NULL)
+    if (NULL == pImageData)
     {
         return FALSE;
     }
@@ -349,14 +365,14 @@ WuGetClipboardImageData_WorkerProc(
 
     hClipboardData = (HBITMAP) GetClipboardData(CF_BITMAP);
     
-    if (hClipboardData == NULL)
+    if (NULL == hClipboardData)
     {
         return FALSE;
     }
 
     pImageData = WuExtractImageDataFromHBITMAP(hClipboardData);
 
-    if (pImageData == NULL)
+    if (NULL == pImageData)
     {
         return FALSE;
     }
@@ -371,7 +387,7 @@ WuGetClipboardImageData(
     IN PWUIMAGEDATA*    ppImageData
     )
 {
-    if (ppImageData == NULL)
+    if (NULL == ppImageData)
     {
         return FALSE;
     }

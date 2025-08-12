@@ -20,7 +20,7 @@ WuAnsiToWide(
 {
     DWORD dwWritten = 0;
 
-    if (szAnsi == NULL || szWideBuffer == NULL)
+    if ((NULL == szAnsi) || (NULL == szWideBuffer))
     {
         return FALSE;
     }
@@ -33,7 +33,7 @@ WuAnsiToWide(
         szWideBuffer,
         (INT) cchWideBufferMaxSize);
 
-    return dwWritten > 0;
+    return (dwWritten > 0);
 }
 
 WUAPI LPWSTR
@@ -45,7 +45,7 @@ WuAnsiToWideHeapAlloc(
     ULONG  cchUnicode = 0;      /* szUnicode length including '\0' */
     BOOL   bResult    = FALSE;
 
-    if (szAnsi == NULL)
+    if (NULL == szAnsi)
     {
         return NULL;
     }
@@ -62,14 +62,14 @@ WuAnsiToWideHeapAlloc(
         HEAP_ZERO_MEMORY,
         cchUnicode * sizeof(WCHAR));
     
-    if (szwUnicode == NULL)
+    if (NULL == szwUnicode)
     {
         return NULL;
     }
 
     bResult = WuAnsiToWide(szAnsi, szwUnicode, cchUnicode);
 
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         HeapFree(GetProcessHeap(), 0, szwUnicode);
         return NULL;
@@ -87,7 +87,7 @@ WuWideToAnsi(
 {
     DWORD dwWritten = 0;
 
-    if (szWide == NULL || szAnsiBuffer == NULL)
+    if ((NULL == szWide) || (NULL == szAnsiBuffer))
     {
         return FALSE;
     }
@@ -102,7 +102,7 @@ WuWideToAnsi(
         NULL,
         NULL);
 
-    return dwWritten > 0;
+    return (dwWritten > 0);
 }
 
 WUAPI LPSTR
@@ -114,7 +114,7 @@ WuWideToAnsiHeapAlloc(
     ULONG cchAnsi = 0;          /* szAnsi length including '\0' */
     BOOL  bResult = FALSE;
 
-    if (szWide == NULL)
+    if (NULL == szWide)
     {
         return NULL;
     }
@@ -128,14 +128,14 @@ WuWideToAnsiHeapAlloc(
 
     szAnsi = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, cchAnsi);
     
-    if (szAnsi == NULL)
+    if (NULL == szAnsi)
     {
         return NULL;
     }
 
     bResult = WuWideToAnsi(szWide, szAnsi, cchAnsi);
 
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         HeapFree(GetProcessHeap(), 0, szAnsi);
         return NULL;

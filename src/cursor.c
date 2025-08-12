@@ -19,6 +19,8 @@
 
 #define CURSOR_MAX  17
 
+#define WU_CURSOR_ICON_MAX  CURSOR_MAX
+
 static LPCWSTR g_aszCursorRegistryNames[CURSOR_MAX] = {
     L"AppStarting",     /* OCR_APPSTARTING  */
     L"Arrow",           /* OCR_NORMAL       */
@@ -65,7 +67,7 @@ DetermineCursorFileType(
     WORD   wIdReserved, wIdType, wIdCount;  /* .cur (ICO )  */
     DWORD  dwChunkId, dwChunkType;          /* .ani (RIFF)  */
 
-    if (szFilePath == NULL)
+    if (NULL == szFilePath)
     {
         return CURSOR_FILE_TYPE_UNKNOWN;
     }
@@ -79,7 +81,7 @@ DetermineCursorFileType(
         FILE_ATTRIBUTE_NORMAL,
         NULL);
 
-    if (hFile == INVALID_HANDLE_VALUE)
+    if (INVALID_HANDLE_VALUE == hFile)
     {
         return CURSOR_FILE_TYPE_UNKNOWN;
     }
@@ -93,7 +95,7 @@ DetermineCursorFileType(
 
     CloseHandle(hFile);
 
-    if (bResult == FALSE || dwReaded != DCFT_BUFFER_SIZE)
+    if ((FALSE == bResult) || (dwReaded != DCFT_BUFFER_SIZE))
     {
         return CURSOR_FILE_TYPE_UNKNOWN;
     }
@@ -102,7 +104,7 @@ DetermineCursorFileType(
     wIdType     = *((WORD*) &abBuffer[2]);
     wIdCount    = *((WORD*) &abBuffer[4]);
 
-    if (wIdReserved == 0 && wIdType == 2 && wIdCount >= 1)
+    if ((0 == wIdReserved) && (2 == wIdType) && (wIdCount >= 1))
     {
         return CURSOR_FILE_TYPE_CUR;
     }
@@ -110,7 +112,7 @@ DetermineCursorFileType(
     dwChunkId   = *((DWORD*) &abBuffer[0]);
     dwChunkType = *((DWORD*) &abBuffer[8]);
 
-    if (dwChunkId == FOURCC_RIFF_ID && dwChunkType == FOURCC_ACON_ID)
+    if ((FOURCC_RIFF_ID == dwChunkId) && (FOURCC_ACON_ID == dwChunkType))
     {
         return CURSOR_FILE_TYPE_ANI;
     }
@@ -123,7 +125,7 @@ IsValidCursorFile(
     IN LPCWSTR  szFilePath
     )
 {
-    return DetermineCursorFileType(szFilePath) != CURSOR_FILE_TYPE_UNKNOWN;
+    return (DetermineCursorFileType(szFilePath) != CURSOR_FILE_TYPE_UNKNOWN);
 }
 
 WUAPI BOOL
@@ -137,7 +139,7 @@ WuSetCursorW(
     HKEY    hCursorsKey = NULL;
     LSTATUS lStatus     = STATUS_SUCCESS;
 
-    if (szCursorPath == NULL || icon >= CURSOR_MAX)
+    if ((NULL == szCursorPath) || (icon >= WU_CURSOR_ICON_MAX))
     {
         return FALSE;
     }
@@ -149,7 +151,7 @@ WuSetCursorW(
         szTempPath,
         MAX_PATH);
 
-    if (cchWritten == 0)
+    if (0 == cchWritten)
     {
         if (GetLastError() != ERROR_SUCCESS)
         {
@@ -169,7 +171,7 @@ WuSetCursorW(
         KEY_SET_VALUE,
         &hCursorsKey);
 
-    if (lStatus != ERROR_SUCCESS || hCursorsKey == NULL)
+    if ((lStatus != ERROR_SUCCESS) || (NULL == hCursorsKey))
     {
         return FALSE;
     }
@@ -208,7 +210,7 @@ WuSetCursorA(
 {
     WCHAR szwPath[MAX_PATH];
     
-    if (szCursorPath == NULL)
+    if (NULL == szCursorPath)
     {
         return FALSE;
     }
@@ -234,7 +236,12 @@ WuGetCursorW(
     DWORD   cbData      = sizeof(szTempPath);
     LSTATUS lStatus     = STATUS_SUCCESS;
 
-    if (szCursorPath == NULL || cchCursorPath <= 0 || icon >= CURSOR_MAX)
+    if ((NULL == szCursorPath) || (cchCursorPath <= 0))
+    {
+        return FALSE;
+    }
+
+    if (icon >= WU_CURSOR_ICON_MAX)
     {
         return FALSE;
     }
@@ -246,7 +253,7 @@ WuGetCursorW(
         KEY_QUERY_VALUE,
         &hCursorsKey);
 
-    if (lStatus != ERROR_SUCCESS || hCursorsKey == NULL)
+    if ((lStatus != ERROR_SUCCESS) || (NULL == hCursorsKey))
     {
         return FALSE;
     }
@@ -279,7 +286,7 @@ WuGetCursorW(
         szCursorPath,
         cchCursorPath);
 
-    if (cchWritten == 0)
+    if (0 == cchWritten)
     {
         if (GetLastError() != ERROR_SUCCESS)
         {
@@ -287,7 +294,7 @@ WuGetCursorW(
         }
     }
 
-    return cchWritten <= cchCursorPath;
+    return (cchWritten <= cchCursorPath);
 }
 
 WUAPI BOOL
@@ -300,14 +307,19 @@ WuGetCursorA(
     WCHAR szwTempPath[MAX_PATH];
     BOOL  bResult = FALSE;
 
-    if (szCursorPath == NULL || cchCursorPath <= 0 || icon >= CURSOR_MAX)
+    if ((NULL == szCursorPath) || (cchCursorPath <= 0))
+    {
+        return FALSE;
+    }
+
+    if (icon >= WU_CURSOR_ICON_MAX)
     {
         return FALSE;
     }
 
     bResult = WuGetCursorW(szwTempPath, MAX_PATH, icon);
 
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         return FALSE;
     }

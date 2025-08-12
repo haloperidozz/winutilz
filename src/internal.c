@@ -30,7 +30,7 @@ GetWinUtilzCacheFileName(
     WCHAR   szTempFilePath[MAX_PATH];
     HRESULT hResult = S_OK;
 
-    if (szFileName == NULL || szFilePath == NULL || cchFilePath == 0)
+    if ((NULL == szFileName) || (NULL == szFilePath) || (0 == cchFilePath))
     {
         return FALSE;
     }
@@ -92,17 +92,17 @@ SetSomethingFromResource(
     LPWSTR szwType = NULL;
     BOOL   bResult = FALSE;
 
-    if (szCacheFileName == NULL || pfnSet == NULL)
+    if ((NULL == szCacheFileName) || (NULL == pfnSet))
     {
         return FALSE;
     }
 
-    if (szResourceName == NULL || szResourceType == NULL)
+    if ((NULL == szResourceName) || (NULL == szResourceType))
     {
         return FALSE;
     }
 
-    if (bUnicode == TRUE)
+    if (TRUE == bUnicode)
     {
         szwName = (LPWSTR) szResourceName;
         szwType = (LPWSTR) szResourceType;
@@ -118,7 +118,7 @@ SetSomethingFromResource(
         szwTempFile,
         MAX_PATH);
 
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         goto cleanup;
     }
@@ -129,7 +129,7 @@ SetSomethingFromResource(
         szwType,
         szwTempFile);
     
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         goto cleanup;
     }
@@ -137,7 +137,7 @@ SetSomethingFromResource(
     bResult = pfnSet(szwTempFile, dwExtraValue);
 
 cleanup:
-    if (bUnicode == FALSE)
+    if (FALSE == bUnicode)
     {
         SafeResParamHeapFree(szwName);
         SafeResParamHeapFree(szwType);
@@ -159,17 +159,17 @@ SetSomethingFromUrl(
     LPWSTR szwUrl  = NULL;
     BOOL   bResult = FALSE;
 
-    if (szCacheFileName == NULL || pfnSet == NULL)
+    if ((NULL == szCacheFileName) || (NULL == pfnSet))
     {
         return FALSE;
     }
 
-    if (szUrl == NULL)
+    if (NULL == szUrl)
     {
         return FALSE;
     }
 
-    if (bUnicode == TRUE)
+    if (TRUE == bUnicode)
     {
         szwUrl = (LPWSTR) szUrl;
     }
@@ -178,7 +178,7 @@ SetSomethingFromUrl(
         szwUrl = WuAnsiToWideHeapAlloc((LPCSTR) szUrl);
     }
 
-    if (szwUrl == NULL)
+    if (NULL == szwUrl)
     {
         goto cleanup;
     }
@@ -188,14 +188,14 @@ SetSomethingFromUrl(
         szwTempFile,
         MAX_PATH);
 
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         goto cleanup;
     }
 
     bResult = WuDownloadFileW(szwUrl, szwTempFile);
     
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         goto cleanup;
     }
@@ -203,7 +203,7 @@ SetSomethingFromUrl(
     bResult = pfnSet(szwTempFile, dwExtraValue);
 
 cleanup:
-    if (szwUrl != NULL && bUnicode == TRUE)
+    if ((szwUrl != NULL) && (TRUE == bUnicode))
     {
         HeapFree(GetProcessHeap(), 0, szwUrl);
     }
@@ -216,7 +216,7 @@ AnsiResParamToWideHeapAlloc(
     IN LPCSTR   szAnsi
     )
 {
-    if (IS_INTRESOURCE(szAnsi) || szAnsi == NULL)
+    if ((NULL == szAnsi) || IS_INTRESOURCE(szAnsi))
     {
         return (LPWSTR) szAnsi;
     }
@@ -231,7 +231,7 @@ SafeResParamHeapFree(
     IN LPVOID   lpParam
     )
 {
-    if (lpParam != NULL && IS_INTRESOURCE(lpParam) == TRUE)
+    if ((lpParam != NULL) && IS_INTRESOURCE(lpParam))
     {
         HeapFree(GetProcessHeap(), 0, lpParam);
     }

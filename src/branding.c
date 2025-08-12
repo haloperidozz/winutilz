@@ -22,7 +22,7 @@ WuBrandingFormatStringW(
 {
     LPWSTR szFormattedString = NULL;
 
-    if (szFormat == NULL || szBuffer == NULL || cchBufferSize == 0)
+    if ((NULL == szFormat) || (NULL == szBuffer) || (0 == cchBufferSize))
     {
         return FALSE;
     }
@@ -40,7 +40,7 @@ WuBrandingFormatStringW(
         return FALSE;
     }
 
-    return GlobalFree((HGLOBAL) szFormattedString) == NULL;
+    return (GlobalFree((HGLOBAL) szFormattedString) == NULL);
 }
 
 WUAPI BOOL
@@ -56,7 +56,7 @@ WuBrandingFormatStringA(
 
     szwFormat = WuAnsiToWideHeapAlloc(szFormat);
 
-    if (szwFormat == NULL)
+    if (NULL == szwFormat)
     {
         return FALSE;
     }
@@ -66,14 +66,14 @@ WuBrandingFormatStringA(
         HEAP_ZERO_MEMORY,
         cchBufferSize * sizeof(WCHAR));
 
-    if (szwBuffer == NULL)
+    if (NULL == szwBuffer)
     {
         goto cleanup;
     }
 
     bResult = WuBrandingFormatStringW(szwFormat, szwBuffer, cchBufferSize);
 
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         goto cleanup;
     }

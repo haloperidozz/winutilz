@@ -70,7 +70,7 @@ WuSaveSysColors(
         return FALSE;
     }
 
-    if (lpaElements == NULL || lpaRgbValues == NULL)
+    if ((NULL == lpaElements) || (NULL == lpaRgbValues))
     {
         return FALSE;
     }
@@ -82,7 +82,7 @@ WuSaveSysColors(
         KEY_SET_VALUE,
         &hColorsKey);
     
-    if (lStatus != ERROR_SUCCESS || hColorsKey == NULL)
+    if ((lStatus != ERROR_SUCCESS) || (NULL == hColorsKey))
     {
         return FALSE;
     }
@@ -126,7 +126,7 @@ WuSaveSysColors(
         }
     }
 
-    return RegCloseKey(hColorsKey) == ERROR_SUCCESS;
+    return (RegCloseKey(hColorsKey) == ERROR_SUCCESS);
 
 on_error:
     RegCloseKey(hColorsKey);

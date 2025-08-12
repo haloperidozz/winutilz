@@ -21,7 +21,7 @@ WuCenterWindow(
     POINT ptWndPosition;
     HWND  hParentWnd = NULL;
 
-    if (hWnd == NULL || IsWindow(hWnd) == FALSE)
+    if ((NULL == hWnd) || (IsWindow(hWnd) == FALSE))
     {
         return FALSE;
     }
@@ -46,7 +46,7 @@ WuCenterWindow(
     {
         hParentWnd = GetParent(hWnd);
 
-        if (hParentWnd == NULL)
+        if (NULL == hParentWnd)
         {
             hParentWnd = GetDesktopWindow();
         }
@@ -86,7 +86,7 @@ ModifyWindowStyle(
     DWORD dwCurrentStyle = 0;
     DWORD dwNewStyle     = 0;
 
-    if (hWnd == NULL || IsWindow(hWnd) == FALSE)
+    if ((NULL == hWnd) || (IsWindow(hWnd) == FALSE))
     {
         return FALSE;
     }
@@ -95,12 +95,12 @@ ModifyWindowStyle(
 
     dwCurrentStyle = (DWORD) GetWindowLongPtrW(hWnd, nIndex);
 
-    if (dwCurrentStyle == 0 && GetLastError() != ERROR_SUCCESS)
+    if ((0 == dwCurrentStyle) && (GetLastError() != ERROR_SUCCESS))
     {
         return FALSE;
     }
 
-    if (bEnable == TRUE)
+    if (TRUE == bEnable)
     {
         dwNewStyle = dwCurrentStyle | dwSingleStyle;
     }
@@ -118,7 +118,7 @@ ModifyWindowStyle(
 
     dwCurrentStyle = (DWORD) SetWindowLongPtrW(hWnd, nIndex, dwNewStyle);
 
-    if (dwCurrentStyle == 0 && GetLastError() != ERROR_SUCCESS)
+    if ((0 == dwCurrentStyle) && (GetLastError() != ERROR_SUCCESS))
     {
         return FALSE;
     }

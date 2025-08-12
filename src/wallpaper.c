@@ -35,7 +35,7 @@ WuSetWallpaperW(
     LSTATUS lStatus          = STATUS_SUCCESS;
     DWORD   cchTempPath      = 0;
 
-    if (szWallpaperPath == NULL)
+    if (NULL == szWallpaperPath)
     {
         return FALSE;
     }
@@ -47,7 +47,7 @@ WuSetWallpaperW(
         KEY_SET_VALUE,
         &hDesktopKey);
 
-    if (lStatus != ERROR_SUCCESS || hDesktopKey == NULL)
+    if ((lStatus != ERROR_SUCCESS) || (NULL == hDesktopKey))
     {
         return FALSE;
     }
@@ -126,7 +126,7 @@ WuSetWallpaperW(
         szTempPath,
         MAX_PATH);
 
-    if (cchTempPath == 0)
+    if (0 == cchTempPath)
     {
         if (GetLastError() != ERROR_SUCCESS)
         {
@@ -149,7 +149,7 @@ WuSetWallpaperA(
 {
     WCHAR szwPath[MAX_PATH];
     
-    if (szWallpaperPath == NULL)
+    if (NULL == szWallpaperPath)
     {
         return FALSE;
     }
@@ -168,7 +168,7 @@ WuGetWallpaperW(
     IN  ULONG   cchWallpaperPath
     )
 {
-    if (szWallpaperPath == NULL || cchWallpaperPath <= 0)
+    if ((NULL == szWallpaperPath) || (cchWallpaperPath <= 0))
     {
         return FALSE;
     }
@@ -186,7 +186,7 @@ WuGetWallpaperA(
     IN  ULONG   cchWallpaperPath
     )
 {
-    if (szWallpaperPath == NULL || cchWallpaperPath <= 0)
+    if ((NULL == szWallpaperPath) || (cchWallpaperPath <= 0))
     {
         return FALSE;
     }
@@ -208,7 +208,7 @@ WuSetWallpaperStyle(
 
     bResult = WuGetWallpaperW(szWallpaperPath, MAX_PATH);
 
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         return FALSE;
     }
@@ -225,7 +225,7 @@ WuSetWallpaperFromImageData(
     WCHAR szWallpaperPath[MAX_PATH];
     BOOL  bResult = FALSE;
 
-    if (pImageData == NULL || pImageData->abData == NULL)
+    if ((NULL == pImageData) || (NULL == pImageData->abData))
     {
         return FALSE;
     }
@@ -235,7 +235,7 @@ WuSetWallpaperFromImageData(
         szWallpaperPath,
         MAX_PATH);
 
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         return FALSE;
     }
@@ -245,7 +245,7 @@ WuSetWallpaperFromImageData(
         szWallpaperPath,
         WU_IMAGE_FORMAT_BMP);
     
-    if (bResult == FALSE)
+    if (FALSE == bResult)
     {
         return FALSE;
     }

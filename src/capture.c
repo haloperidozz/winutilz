@@ -40,7 +40,7 @@ WuCaptureWindow(
     SIZE_T       cbImage    = 0;
     INT          i          = 0;
 
-    if (hWnd == NULL || IsWindow(hWnd) == FALSE)
+    if ((NULL == hWnd) || (IsWindow(hWnd) == FALSE))
     {
         return NULL;
     }
@@ -55,14 +55,14 @@ WuCaptureWindow(
 
     hWindowDC = GetWindowDC(hWnd);
 
-    if (hWindowDC == NULL)
+    if (NULL == hWindowDC)
     {
         return NULL;
     }
 
     hMemoryDC = CreateCompatibleDC(hWindowDC);
     
-    if (hMemoryDC == NULL)
+    if (NULL == hMemoryDC)
     {
         goto cleanup;
     }
@@ -72,7 +72,7 @@ WuCaptureWindow(
         windowSize.cx,
         windowSize.cy);
 
-    if (hbmCapture == NULL)
+    if (NULL == hbmCapture)
     {
         goto cleanup;
     }
@@ -84,21 +84,21 @@ WuCaptureWindow(
         bCaptured = PrintWindow(hWnd, hMemoryDC, PW_RENDERFULLCONTENT);
     }
 
-    if (bCaptured == FALSE)
+    if (FALSE == bCaptured)
     {
         if (FAILED(DwmIsCompositionEnabled(&bCaptured)))
         {
             goto dwm_failed;
         }
 
-        if (bCaptured == TRUE)
+        if (TRUE == bCaptured)
         {
             bCaptured = PrintWindow(hWnd, hMemoryDC, 0);
         }
     }
 
 dwm_failed:
-    if (bCaptured == FALSE)
+    if (FALSE == bCaptured)
     {
         bCaptured = BitBlt(
             hMemoryDC, 0, 0,
@@ -107,7 +107,7 @@ dwm_failed:
             SRCCOPY);
     }
 
-    if (bCaptured == FALSE)
+    if (FALSE == bCaptured)
     {
         DeleteObject(hbmCapture);
         SelectObject(hMemoryDC, hbmOld);

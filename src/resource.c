@@ -13,6 +13,7 @@
 
 #include "internal.h"
 
+/* TODO: */
 WUAPI BOOL
 WuResourceExists(
     IN HINSTANCE    hInstance,
@@ -20,7 +21,7 @@ WuResourceExists(
     IN LPCTSTR      szResourceType
     )
 {
-    return FindResource(hInstance, szResourceName, szResourceType) != NULL;
+    return (NULL != FindResource(hInstance, szResourceName, szResourceType));
 }
 
 WUAPI LPVOID
@@ -34,33 +35,33 @@ WuLoadResourceToMemoryW(
     HRSRC   hResource     = NULL;
     HGLOBAL hResourceData = NULL;
 
-    if (szResourceName == NULL || szResourceType == NULL)
+    if ((NULL == szResourceName) || (NULL == szResourceType))
     {
         return NULL;
     }
 
-    if (pcbSize == NULL)
+    if (NULL == pcbSize)
     {
         return NULL;
     }
 
     hResource = FindResourceW(hInstance, szResourceName, szResourceType);
 
-    if (hResource == NULL)
+    if (NULL == hResource)
     {
         return NULL;
     }
 
     *pcbSize = SizeofResource(hInstance, hResource);
 
-    if ((*pcbSize) == 0)
+    if (0 == (*pcbSize))
     {
         return NULL;
     }
 
     hResourceData = LoadResource(hInstance, hResource);
 
-    if (hResourceData == NULL)
+    if (NULL == hResourceData)
     {
         return NULL;
     }
@@ -111,12 +112,12 @@ WuExtractResourceToFileW(
     DWORD  dwWritten      = 0;
     BOOL   bResult        = FALSE;
 
-    if (szResourceName == NULL || szResourceType == NULL)
+    if ((NULL == szResourceName) || (NULL == szResourceType))
     {
         return FALSE;
     }
 
-    if (szFilePath == NULL)
+    if (NULL == szFilePath)
     {
         return FALSE;
     }
@@ -127,7 +128,7 @@ WuExtractResourceToFileW(
         szResourceType,
         &cbResourceData);
     
-    if (pResourceData == NULL)
+    if (NULL == pResourceData)
     {
         goto cleanup;
     }
@@ -139,7 +140,7 @@ WuExtractResourceToFileW(
         szTempPath,
         MAX_PATH);
 
-    if (cchTempPath == 0)
+    if (0 == cchTempPath)
     {
         if (GetLastError() != ERROR_SUCCESS)
         {
@@ -156,7 +157,7 @@ WuExtractResourceToFileW(
         FILE_ATTRIBUTE_NORMAL,
         NULL);
     
-    if (hResourceFile == INVALID_HANDLE_VALUE)
+    if (INVALID_HANDLE_VALUE == hResourceFile)
     {
         goto cleanup;
     }

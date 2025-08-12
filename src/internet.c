@@ -43,7 +43,7 @@ WuHttpGetRequest(
     DWORD     cbRead        = 0;
     BOOL      bResult       = FALSE;
 
-    if (szURL == NULL || fnWriteDataProc == NULL)
+    if ((NULL == szURL) || (NULL == fnWriteDataProc))
     {
         return FALSE;
     }
@@ -60,7 +60,7 @@ WuHttpGetRequest(
         NULL,
         0);
     
-    if (hInternet == NULL)
+    if (NULL == hInternet)
     {
         goto cleanup;
     }
@@ -73,7 +73,7 @@ WuHttpGetRequest(
         INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE,
         0);
     
-    if (hInternetData == NULL)
+    if (NULL == hInternetData)
     {
         goto cleanup;
     }
@@ -86,12 +86,12 @@ WuHttpGetRequest(
             BLOCK_SIZE,
             &cbRead);
 
-        if (bResult == FALSE)
+        if (FALSE == bResult)
         {
             goto cleanup;
         }
 
-        if (cbRead == 0)
+        if (0 == cbRead)
         {
             break;
         }
@@ -100,7 +100,7 @@ WuHttpGetRequest(
 
         bResult = fnWriteDataProc(abBlock, cbRead, cbTotal, pUserData);
 
-        if (bResult == FALSE)
+        if (FALSE == bResult)
         {
             goto cleanup;
         }
@@ -135,7 +135,7 @@ WuDownloadFileW_WriteDataProc(
 
     bResult = WriteFile(hFile, pBlock, cbRead, &dwWritten, NULL);
 
-    return bResult != FALSE && dwWritten == cbRead;
+    return ((bResult != FALSE) && (dwWritten == cbRead));
 }
 
 WUAPI BOOL
@@ -149,7 +149,7 @@ WuDownloadFileW(
     HANDLE hOutputFile = INVALID_HANDLE_VALUE;
     BOOL   bResult     = FALSE;
 
-    if (szURL == NULL || szDestPath == NULL)
+    if ((NULL == szURL) || (NULL == szDestPath))
     {
         return FALSE;
     }
@@ -161,7 +161,7 @@ WuDownloadFileW(
         szDestPathTemp,
         MAX_PATH);
 
-    if (cchTempPath == 0)
+    if (0 == cchTempPath)
     {
         if (GetLastError() != ERROR_SUCCESS)
         {
@@ -178,7 +178,7 @@ WuDownloadFileW(
         FILE_ATTRIBUTE_NORMAL,
         NULL);
     
-    if (hOutputFile == INVALID_HANDLE_VALUE)
+    if (INVALID_HANDLE_VALUE == hOutputFile)
     {
         goto cleanup;
     }
@@ -189,7 +189,7 @@ WuDownloadFileW(
         hOutputFile);
 
 cleanup:
-    if (hOutputFile != INVALID_HANDLE_VALUE)
+    if (INVALID_HANDLE_VALUE != hOutputFile)
     {
         CloseHandle(hOutputFile);
     }
@@ -207,14 +207,14 @@ WuDownloadFileA(
     LPWSTR szwURL  = NULL;
     BOOL   bResult = FALSE;
 
-    if (szURL == NULL || szDestPath == NULL)
+    if ((NULL == szURL) || (NULL == szDestPath))
     {
         return FALSE;
     }
 
     szwURL = WuAnsiToWideHeapAlloc(szURL);
 
-    if (szwURL == NULL)
+    if (NULL == szwURL)
     {
         return FALSE;
     }
@@ -265,7 +265,7 @@ WuDownloadToMemoryW_WriteDataProc(
             pBuffer->pData,
             cbNewAlloc);
         
-        if (pNewData == NULL)
+        if (NULL == pNewData)
         {
             return FALSE;
         }
@@ -292,7 +292,7 @@ WuDownloadToMemoryW(
 
     ZeroMemory(&buffer, sizeof(MEMORYBUFFER));
 
-    if (szURL == NULL || ppHeapAllocatedData == NULL || pcbSize == NULL)
+    if ((NULL == szURL) || (NULL == ppHeapAllocatedData) || (NULL == pcbSize))
     {
         return FALSE;
     }
@@ -302,7 +302,7 @@ WuDownloadToMemoryW(
 
     buffer.pData = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, BLOCK_SIZE);
     
-    if (buffer.pData == NULL)
+    if (NULL == buffer.pData)
     {
         return FALSE;
     }
@@ -314,7 +314,7 @@ WuDownloadToMemoryW(
         (WRITEDATAPROC) WuDownloadToMemoryW_WriteDataProc,
         &buffer);
 
-    if (bResult == TRUE)
+    if (TRUE == bResult)
     {
         *ppHeapAllocatedData = buffer.pData;
         *pcbSize             = buffer.cbSize;
@@ -340,14 +340,14 @@ WuDownloadToMemoryA(
     LPWSTR szwURL  = NULL;
     BOOL   bResult = FALSE;
 
-    if (szURL == NULL)
+    if (NULL == szURL)
     {
         return FALSE;
     }
 
     szwURL = WuAnsiToWideHeapAlloc(szURL);
 
-    if (szwURL == NULL)
+    if (NULL == szwURL)
     {
         return FALSE;
     }

@@ -72,7 +72,7 @@ InputBox_OnPressOkButton(
 {
     UINT cchCopied = 0;
 
-    if (pParams->szInput == NULL)
+    if (NULL == pParams->szInput)
     {
         return EndDialog(hDlg, IDOK) != FALSE;
     }
@@ -85,15 +85,15 @@ InputBox_OnPressOkButton(
         pParams->szInput,
         pParams->cchInputMaxSize);
 
-    if (cchCopied == 0)
+    if (0 == cchCopied)
     {
         if (GetLastError() != ERROR_SUCCESS)
         {
-            return EndDialog(hDlg, 0) != FALSE;
+            return (EndDialog(hDlg, 0) != FALSE);
         }
     }
 
-    return EndDialog(hDlg, IDOK) != FALSE;
+    return (EndDialog(hDlg, IDOK) != FALSE);
 }
 
 static BOOL
@@ -102,7 +102,7 @@ InputBox_OnPressCancelButton(
     IN PWUINPUTBOXPARAMSW   pParams
     )
 {
-    return EndDialog(hDlg, IDCANCEL) != FALSE;
+    return (EndDialog(hDlg, IDCANCEL) != FALSE);
 }
 
 static BOOL
@@ -131,7 +131,7 @@ InputBox_OnClose(
     IN PWUINPUTBOXPARAMSW   pParams
     )
 {
-    return EndDialog(hDlg, IDC_CANCEL) != FALSE;
+    return (EndDialog(hDlg, IDCANCEL) != FALSE);
 }
 
 static INT_PTR CALLBACK
@@ -146,14 +146,14 @@ InputBox_Proc(
 
     pParams = (PWUINPUTBOXPARAMSW) GetWindowLongPtrW(hDlg, GWLP_USERDATA);
 
-    if (uMsg == WM_INITDIALOG)
+    if (WM_INITDIALOG == uMsg)
     {
         pParams = (PWUINPUTBOXPARAMSW) lParam;
 
         SetWindowLongPtrW(hDlg, GWLP_USERDATA, (LONG_PTR) pParams);
     }
 
-    if (pParams == NULL)
+    if (NULL == pParams)
     {
         return FALSE;
     }
@@ -183,7 +183,12 @@ WuInputBoxIndirectW(
     IN PWUINPUTBOXPARAMSW   pParams
     )
 {
-    if (pParams == NULL || pParams->cbSize != sizeof(WUINPUTBOXPARAMSW))
+    if (NULL == pParams)
+    {
+        return 0;
+    }
+
+    if (pParams->cbSize != sizeof(WUINPUTBOXPARAMSW))
     {
         return 0;
     }
@@ -208,8 +213,13 @@ WuInputBoxIndirectA(
     LPWSTR            szInput         = NULL;
     INT               iInputBoxResult = 0;
     BOOL              bResult         = FALSE;
-    
-    if (pParams == NULL || pParams->cbSize != sizeof(WUINPUTBOXPARAMSA))
+
+    if (NULL == pParams)
+    {
+        return 0;
+    }
+
+    if (pParams->cbSize != sizeof(WUINPUTBOXPARAMSA))
     {
         return 0;
     }
@@ -227,7 +237,7 @@ WuInputBoxIndirectA(
             0,
             pParams->cchInputMaxSize * sizeof(WCHAR));
         
-        if (szInput == NULL)
+        if (NULL == szInput)
         {
             goto cleanup;
         }
@@ -251,7 +261,7 @@ WuInputBoxIndirectA(
             pParams->szInput,
             pParams->cchInputMaxSize);
         
-        if (bResult == FALSE)
+        if (FALSE == bResult)
         {
             iInputBoxResult = 0;
         }

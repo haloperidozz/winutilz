@@ -22,16 +22,16 @@
 #define WM_REFRESH          0x7103
 #define WM_HARD_REFRESH     0x7104
 
-#define ICON_ARRANGE_MAX    4
+#define WU_DESKTOP_ICON_ARRANGE_MAX    4
 
-static CONST UINT s_auIconArrangeCommandWin7[ICON_ARRANGE_MAX] = {
+static CONST UINT s_auArrangeCommandWin7[WU_DESKTOP_ICON_ARRANGE_MAX] = {
     0x7071,     /* DESKTOP_ICON_ARRANGE_AUTO            */
     0x7072,     /* DESKTOP_ICON_ARRANGE_GRID            */
     0x7073,     /* DESKTOP_ICON_ARRANGE_DISPLAYICONS    */
     0x7074      /* DESKTOP_ICON_ARRANGE_AUTOGRID        */
 };
 
-static CONST UINT s_auIconArrangeCommandWinXp[ICON_ARRANGE_MAX] = {
+static CONST UINT s_auArrangeCommandWinXp[WU_DESKTOP_ICON_ARRANGE_MAX] = {
     0x7051,     /* DESKTOP_ICON_ARRANGE_AUTO            */
     0x7052,     /* DESKTOP_ICON_ARRANGE_GRID            */
     0x7053,     /* DESKTOP_ICON_ARRANGE_DISPLAYICONS    */
@@ -50,7 +50,7 @@ FindDefViewWindow_EnumWindowsProc(
 
     /* https://stackoverflow.com/a/60856252 */
     
-    if (hNextWin == NULL)
+    if (NULL == hNextWin)
     {
         return TRUE;
     }
@@ -76,7 +76,7 @@ WuGetDesktopDefViewWindow(
     HWND hDefView = NULL;
     HWND hProgMan = GetShellWindow();
     
-    if (hProgMan == NULL)
+    if (NULL == hProgMan)
     {
         return NULL;
     }
@@ -100,7 +100,7 @@ DefViewSendCommandId(
 {
     HWND hDefView = WuGetDesktopDefViewWindow();
 
-    if (hDefView == NULL)
+    if (NULL == hDefView)
     {
         return;
     }
@@ -118,7 +118,7 @@ WuGetDesktopListView(
 {
     HWND hDefView = WuGetDesktopDefViewWindow();
 
-    if (hDefView == NULL)
+    if (NULL == hDefView)
     {
         return NULL;
     }
@@ -139,18 +139,18 @@ WuDesktopToggleIconArrangement(
     IN WU_DESKTOP_ICON_ARRANGE  arrange
     )
 {
-    if (arrange >= ICON_ARRANGE_MAX)
+    if (arrange >= WU_DESKTOP_ICON_ARRANGE_MAX)
     {
         return;
     }
 
     if (IsWindows7OrGreater() != FALSE)
     {
-        DefViewSendCommandId(s_auIconArrangeCommandWin7[arrange]);
+        DefViewSendCommandId(s_auArrangeCommandWin7[arrange]);
     }
     else
     {
-        DefViewSendCommandId(s_auIconArrangeCommandWinXp[arrange]);
+        DefViewSendCommandId(s_auArrangeCommandWinXp[arrange]);
     }
 }
 
@@ -162,7 +162,7 @@ WuDesktopAreIconsArrangedByGrid(
     HWND  hListView = WuGetDesktopListView();
     DWORD dwExStyle = 0;
 
-    if (hListView == NULL)
+    if (NULL == hListView)
     {
         return FALSE;
     }
@@ -173,7 +173,7 @@ WuDesktopAreIconsArrangedByGrid(
         0,
         0);
 
-    return dwExStyle & LVS_EX_SNAPTOGRID;
+    return (dwExStyle & LVS_EX_SNAPTOGRID);
 }
 
 WUAPI VOID
@@ -200,7 +200,7 @@ WuDesktopAreIconsVisible(
     
     SHGetSetSettings(&shellState, SSF_HIDEICONS, FALSE);
     
-    return shellState.fHideIcons == 0;
+    return (0 == shellState.fHideIcons);
 }
 
 WUAPI VOID

@@ -27,9 +27,9 @@ BrandingFormatString(
     static HMODULE                  hModule = NULL;
     static BrandingFormatStringType fpFunc  = NULL;
     
-    if (fpFunc == NULL)
+    if (NULL == fpFunc)
     {
-        if (hModule == NULL)
+        if (NULL == hModule)
         {
             hModule = LoadLibraryExA(
                 "winbrand.dll",
@@ -74,9 +74,9 @@ SHCreateWorkerWindowW(
     static HMODULE                   hModule = NULL;
     static SHCreateWorkerWindowWType fpFunc  = NULL;
     
-    if (fpFunc == NULL)
+    if (NULL == fpFunc)
     {
-        if (hModule == NULL)
+        if (NULL == hModule)
         {
             hModule = LoadLibraryExA(
                 "shlwapi.dll",
