@@ -154,7 +154,7 @@ WuDownloadFileW(
         return FALSE;
     }
 
-    bResult = _WuSafeExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStrings(
         szDestPath,
         szDestPathTemp,
         MAX_PATH);

@@ -33,21 +33,21 @@ WuSetWallpaperW(
     LPCWSTR szWallpaperStyle = NULL;
     LPCWSTR szTileWallpaper  = NULL;
     BOOL    bResult          = FALSE;
-    LSTATUS lStatus          = STATUS_SUCCESS;
+    LONG    lResult          = ERROR_SUCCESS;
 
     if (NULL == szWallpaperPath)
     {
         return FALSE;
     }
 
-    lStatus = RegOpenKeyExW(
+    lResult = RegOpenKeyExW(
         HKEY_CURRENT_USER,
         REGISTRY_PATH_DESKTOP,
         0,
         KEY_SET_VALUE,
         &hDesktopKey);
 
-    if ((lStatus != ERROR_SUCCESS) || (NULL == hDesktopKey))
+    if ((lResult != ERROR_SUCCESS) || (NULL == hDesktopKey))
     {
         return FALSE;
     }
@@ -86,7 +86,7 @@ WuSetWallpaperW(
             return FALSE;
     }
 
-    lStatus = RegSetValueExW(
+    lResult = RegSetValueExW(
         hDesktopKey,
         REGISTRY_KEY_TILEWALLPAPER,
         0,
@@ -94,13 +94,13 @@ WuSetWallpaperW(
         (LPBYTE) szTileWallpaper,
         (lstrlenW(szTileWallpaper) + 1) * sizeof(WCHAR));
     
-    if (lStatus != ERROR_SUCCESS)
+    if (lResult != ERROR_SUCCESS)
     {
         RegCloseKey(hDesktopKey);
         return FALSE;
     }
 
-    lStatus = RegSetValueExW(
+    lResult = RegSetValueExW(
         hDesktopKey,
         REGISTRY_KEY_WALLPAPERSTYLE,
         0,
@@ -108,18 +108,15 @@ WuSetWallpaperW(
         (LPBYTE) szWallpaperStyle,
         (lstrlenW(szWallpaperStyle) + 1) * sizeof(WCHAR));
     
-    if (lStatus != ERROR_SUCCESS)
+    if (lResult != ERROR_SUCCESS)
     {
         RegCloseKey(hDesktopKey);
         return FALSE;
     }
 
-    if (RegCloseKey(hDesktopKey) != ERROR_SUCCESS)
-    {
-        return FALSE;
-    }
+    RegCloseKey(hDesktopKey);
 
-    bResult = _WuSafeExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStrings(
         szWallpaperPath,
         szTempPath,
         MAX_PATH);

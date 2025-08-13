@@ -15,10 +15,17 @@
 #include <shlwapi.h>
 #include <tchar.h>
 #include <strsafe.h>
+#include <versionhelpers.h>
 
 #include "winutilz.h"
 
 #define CACHE_DIRECTORY_NAME    L"WinUtilzCache"
+
+#define REGISTRY_PATH_THEMES    L"Software\\Microsoft\\Windows"     \
+                                L"\\CurrentVersion\\Themes"
+
+#define REGISTRY_KEY_CURRENTTHEME  L"CurrentTheme"      /* Vista+ */
+#define REGISTRY_KEY_INSTALLTHEME  L"InstallTheme"
 
 BOOL
 _WuGetWinUtilzCacheFileName(
@@ -27,7 +34,7 @@ _WuGetWinUtilzCacheFileName(
     IN  ULONG   cchFilePath
     )
 {
-    WCHAR   szTempFilePath[MAX_PATH];
+    WCHAR   szBuffer[MAX_PATH];
     HRESULT hResult = S_OK;
 
     if ((NULL == szFileName) || (NULL == szFilePath) || (0 == cchFilePath))
@@ -41,7 +48,7 @@ _WuGetWinUtilzCacheFileName(
         CSIDL_LOCAL_APPDATA,
         NULL,
         0,
-        szTempFilePath);
+        szBuffer);
 
     if (FAILED(hResult))
     {
@@ -49,98 +56,92 @@ _WuGetWinUtilzCacheFileName(
     }
 
     /* C:\Users\%USERNAME%\AppData\Local\WinUtilzCache */
-    if (PathAppendW(szTempFilePath, CACHE_DIRECTORY_NAME) == FALSE)
+    if (PathAppendW(szBuffer, CACHE_DIRECTORY_NAME) == FALSE)
     {
         return FALSE;
     }
 
-    if (PathFileExistsW(szTempFilePath) == FALSE)
+    if (PathFileExistsW(szBuffer) == FALSE)
     {
-        if (CreateDirectoryW(szTempFilePath, NULL) == FALSE)
+        if (CreateDirectoryW(szBuffer, NULL) == FALSE)
         {
             return FALSE;
         }
     }
 
     /* C:\Users\%USERNAME%\AppData\Local\WinUtilzCache\$szFileName */
-    if (PathAppendW(szTempFilePath, szFileName) == FALSE)
+    if (PathAppendW(szBuffer, szFileName) == FALSE)
     {
         return FALSE;
     }
 
-    if (FAILED(StringCchCopyW(szFilePath, cchFilePath, szTempFilePath)))
-    {
-        return FALSE;
-    }
-
-    return TRUE;
+    return SUCCEEDED(StringCchCopyW(szFilePath, cchFilePath, szBuffer));
 }
 
 BOOL
 _WuSetSomethingFromResource(
     IN BOOL             bUnicode,
     IN LPCWSTR          szCacheFileName,
-    IN SETFROMFILEPROC  pfnSet,
+    IN SETFROMFILEPROC  pfnSetFromFile,
     IN HINSTANCE        hInstance,
     IN LPVOID           szResourceName,
     IN LPVOID           szResourceType,
     IN DWORD            dwExtraValue
     )
 {
-    WCHAR  szwTempFile[MAX_PATH];
+    WCHAR  szwTemp[MAX_PATH];
     LPWSTR szwName = NULL;
     LPWSTR szwType = NULL;
     BOOL   bResult = FALSE;
 
-    if ((NULL == szCacheFileName) || (NULL == pfnSet))
+    if ((NULL == szCacheFileName) || (NULL == pfnSetFromFile))
     {
         return FALSE;
     }
 
-    if ((NULL == szResourceName) || (NULL == szResourceType))
-    {
-        return FALSE;
-    }
-
-    if (TRUE == bUnicode)
+    if (TRUE == bUnicode || IS_INTRESOURCE(szResourceName))
     {
         szwName = (LPWSTR) szResourceName;
+    }
+    else
+    {
+        szwName = WuAnsiToWideHeapAlloc(szResourceName);
+    }
+
+    if (TRUE == bUnicode || IS_INTRESOURCE(szResourceType))
+    {
         szwType = (LPWSTR) szResourceType;
     }
     else
     {
-        szwName = _WuAnsiResParamToWideHeapAlloc(szResourceName);
-        szwType = _WuAnsiResParamToWideHeapAlloc(szResourceType);
+        szwType = WuAnsiToWideHeapAlloc(szResourceType);
     }
 
-    bResult = _WuGetWinUtilzCacheFileName(
-        szCacheFileName,
-        szwTempFile,
-        MAX_PATH);
+    bResult = _WuGetWinUtilzCacheFileName(szCacheFileName, szwTemp, MAX_PATH);
 
     if (FALSE == bResult)
     {
         goto cleanup;
     }
 
-    bResult = WuExtractResourceToFileW(
-        hInstance,
-        szwName,
-        szwType,
-        szwTempFile);
+    bResult = WuExtractResourceToFileW(hInstance, szwName, szwType, szwTemp);
     
     if (FALSE == bResult)
     {
         goto cleanup;
     }
 
-    bResult = pfnSet(szwTempFile, dwExtraValue);
+    bResult = pfnSetFromFile(szwTemp, dwExtraValue);
 
 cleanup:
-    if (FALSE == bUnicode)
+    if (FALSE == bUnicode && IS_INTRESOURCE(szwName) == FALSE)
     {
-        _WuSafeResParamHeapFree(szwName);
-        _WuSafeResParamHeapFree(szwType);
+        HeapFree(GetProcessHeap(), 0, szwName);
+    }
+
+    if (FALSE == bUnicode && IS_INTRESOURCE(szwType) == FALSE)
+    {
+        HeapFree(GetProcessHeap(), 0, szwType);
     }
 
     return bResult;
@@ -150,16 +151,16 @@ BOOL
 _WuSetSomethingFromUrl(
     IN BOOL             bUnicode,
     IN LPCWSTR          szCacheFileName,
-    IN SETFROMFILEPROC  pfnSet,
+    IN SETFROMFILEPROC  pfnSetFromFile,
     IN LPVOID           szUrl,
     IN DWORD            dwExtraValue
     )
 {
-    WCHAR  szwTempFile[MAX_PATH];
+    WCHAR  szwTemp[MAX_PATH];
     LPWSTR szwUrl  = NULL;
     BOOL   bResult = FALSE;
 
-    if ((NULL == szCacheFileName) || (NULL == pfnSet))
+    if ((NULL == szCacheFileName) || (NULL == pfnSetFromFile))
     {
         return FALSE;
     }
@@ -176,31 +177,28 @@ _WuSetSomethingFromUrl(
     else
     {
         szwUrl = WuAnsiToWideHeapAlloc((LPCSTR) szUrl);
+
+        if (NULL == szwUrl)
+        {
+            goto cleanup;
+        }
     }
 
-    if (NULL == szwUrl)
-    {
-        goto cleanup;
-    }
-
-    bResult = _WuGetWinUtilzCacheFileName(
-        szCacheFileName,
-        szwTempFile,
-        MAX_PATH);
+    bResult = _WuGetWinUtilzCachePath(szCacheFileName, szwTemp, MAX_PATH);
 
     if (FALSE == bResult)
     {
         goto cleanup;
     }
 
-    bResult = WuDownloadFileW(szwUrl, szwTempFile);
+    bResult = WuDownloadFileW(szwUrl, szwTemp);
     
     if (FALSE == bResult)
     {
         goto cleanup;
     }
 
-    bResult = pfnSet(szwTempFile, dwExtraValue);
+    bResult = pfnSetFromFile(szwTemp, dwExtraValue);
 
 cleanup:
     if ((szwUrl != NULL) && (TRUE == bUnicode))
@@ -211,54 +209,107 @@ cleanup:
     return bResult;
 }
 
-LPWSTR
-_WuAnsiResParamToWideHeapAlloc(
-    IN LPCSTR   szAnsi
-    )
-{
-    if ((NULL == szAnsi) || IS_INTRESOURCE(szAnsi))
-    {
-        return (LPWSTR) szAnsi;
-    }
-    else
-    {
-        return WuAnsiToWideHeapAlloc(szAnsi);
-    }
-}
-
-VOID
-_WuSafeResParamHeapFree(
-    IN LPVOID   lpParam
-    )
-{
-    if ((lpParam != NULL) && IS_INTRESOURCE(lpParam))
-    {
-        HeapFree(GetProcessHeap(), 0, lpParam);
-    }
-}
-
 BOOL
-_WuSafeExpandEnvironmentStringsW(
-    IN  LPCWSTR lpSrc,
-    OUT LPWSTR  lpDst,
-    IN  DWORD   nSize
+_WuSafeExpandEnvironmentStrings(
+    IN  LPCWSTR szSource,
+    OUT LPWSTR  szBuffer,
+    IN  DWORD   cchSize
     )
 {
     DWORD cchWritten = 0;
 
-    if ((NULL == lpSrc) || (NULL == lpDst) || (nSize <= 0))
+    if ((NULL == szSource) || (NULL == szBuffer) || (cchSize <= 0))
     {
         return FALSE;
     }
 
     SetLastError(ERROR_SUCCESS);
 
-    cchWritten = ExpandEnvironmentStringsW(lpSrc, lpDst, nSize);
+    cchWritten = ExpandEnvironmentStringsW(szSource, szBuffer, cchSize);
 
-    if ((0 == cchWritten) && (GetLastError() != ERROR_SUCCESS))
+    return !((0 == cchWritten) && (GetLastError() != ERROR_SUCCESS));
+}
+
+BOOL
+_WuCurrentThemeGetStringProperty(
+    IN  LPCWSTR szSection,
+    IN  LPCWSTR szKey,
+    OUT LPWSTR  szBuffer,
+    IN  ULONG   cchBufferSize
+    )
+{
+    static WCHAR s_szThemePath[MAX_PATH];
+    static BOOL  s_bThemePathInitialized = FALSE;
+
+    HKEY    hThemesKey  = NULL;
+    DWORD   cbData      = sizeof(s_szThemePath);
+    LPCWSTR szKeyName   = NULL;
+    DWORD   cchWritten  = 0;
+    LONG    lResult     = ERROR_SUCCESS;
+
+    if (NULL == szSection || NULL == szKey || NULL == szBuffer)
     {
         return FALSE;
     }
 
-    return (cchWritten == nSize);
+    if (0 == cchBufferSize)
+    {
+        return FALSE;
+    }
+
+    if (s_bThemePathInitialized == TRUE && s_szThemePath[0] != L'\0')
+    {
+        goto get_property;
+    }
+
+    lResult = RegOpenKeyExW(
+        HKEY_CURRENT_USER,
+        REGISTRY_PATH_THEMES,
+        0,
+        KEY_QUERY_VALUE,
+        &hThemesKey);
+
+    if ((lResult != ERROR_SUCCESS) || (NULL == hThemesKey))
+    {
+        return FALSE;
+    }
+
+    szKeyName = IsWindowsVistaOrGreater()
+        ? REGISTRY_KEY_CURRENTTHEME
+        : REGISTRY_KEY_INSTALLTHEME;
+
+    ZeroMemory(s_szThemePath, sizeof(s_szThemePath));
+
+    lResult = RegQueryValueExW(
+        hThemesKey,
+        szKeyName,
+        NULL,
+        NULL,
+        (LPBYTE) s_szThemePath,
+        &cbData);
+    
+    if (lResult != ERROR_SUCCESS)
+    {
+        RegCloseKey(hThemesKey);
+        return FALSE;
+    }
+    else
+    {
+        s_bThemePathInitialized = TRUE;
+    }
+
+    RegCloseKey(hThemesKey);
+
+get_property:
+    SetLastError(ERROR_SUCCESS);
+
+    cchWritten = GetPrivateProfileStringW(
+        szSection,
+        szKey,
+        L"",
+        szBuffer,
+        cchBufferSize,
+        s_szThemePath);
+
+    return !((0 == cchWritten) && (GetLastError() != ERROR_SUCCESS));
 }

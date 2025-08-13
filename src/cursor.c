@@ -11,8 +11,6 @@
 
 #include "winutilz.h"
 
-#include <ntstatus.h>
-
 #include "internal.h"
 
 #define REGISTRY_PATH_CURSORS   L"Control Panel\\Cursors"
@@ -134,17 +132,17 @@ WuSetCursorW(
     IN WU_CURSOR_ICON   icon
     )
 {
-    WCHAR   szTempPath[MAX_PATH];
-    HKEY    hCursorsKey = NULL;
-    BOOL    bResult     = FALSE;
-    LSTATUS lStatus     = STATUS_SUCCESS;
+    WCHAR szTempPath[MAX_PATH];
+    HKEY  hCursorsKey = NULL;
+    BOOL  bResult     = FALSE;
+    LONG  lResult     = ERROR_SUCCESS;
 
     if ((NULL == szCursorPath) || (icon >= WU_CURSOR_ICON_MAX))
     {
         return FALSE;
     }
 
-    bResult = _WuSafeExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStrings(
         szCursorPath,
         szTempPath,
         MAX_PATH);
@@ -159,19 +157,19 @@ WuSetCursorW(
         return FALSE;
     }
 
-    lStatus = RegOpenKeyExW(
+    lResult = RegOpenKeyExW(
         HKEY_CURRENT_USER,
         REGISTRY_PATH_CURSORS,
         0,
         KEY_SET_VALUE,
         &hCursorsKey);
 
-    if ((lStatus != ERROR_SUCCESS) || (NULL == hCursorsKey))
+    if ((lResult != ERROR_SUCCESS) || (NULL == hCursorsKey))
     {
         return FALSE;
     }
 
-    lStatus = RegSetValueExW(
+    lResult = RegSetValueExW(
         hCursorsKey,
         g_aszCursorRegistryNames[icon],
         0,
@@ -179,16 +177,13 @@ WuSetCursorW(
         (CONST BYTE*) szTempPath,
         MAX_PATH * sizeof(WCHAR));
     
-    if (lStatus != ERROR_SUCCESS)
+    if (lResult != ERROR_SUCCESS)
     {
         RegCloseKey(hCursorsKey);
         return FALSE;
     }
 
-    if (RegCloseKey(hCursorsKey) != ERROR_SUCCESS)
-    {
-        return FALSE;
-    }
+    RegCloseKey(hCursorsKey);
 
     return SystemParametersInfoW(
         SPI_SETCURSORS,
@@ -225,10 +220,10 @@ WuGetCursorW(
     IN  WU_CURSOR_ICON  icon
     )
 {
-    WCHAR   szTempPath[MAX_PATH];
-    HKEY    hCursorsKey = NULL;
-    DWORD   cbData      = sizeof(szTempPath);
-    LSTATUS lStatus     = STATUS_SUCCESS;
+    WCHAR szTempPath[MAX_PATH];
+    HKEY  hCursorsKey = NULL;
+    DWORD cbData      = sizeof(szTempPath);
+    LONG  lResult     = ERROR_SUCCESS;
 
     if ((NULL == szCursorPath) || (cchCursorPath <= 0))
     {
@@ -240,21 +235,21 @@ WuGetCursorW(
         return FALSE;
     }
 
-    lStatus = RegOpenKeyExW(
+    lResult = RegOpenKeyExW(
         HKEY_CURRENT_USER,
         REGISTRY_PATH_CURSORS,
         0,
         KEY_QUERY_VALUE,
         &hCursorsKey);
 
-    if ((lStatus != ERROR_SUCCESS) || (NULL == hCursorsKey))
+    if ((lResult != ERROR_SUCCESS) || (NULL == hCursorsKey))
     {
         return FALSE;
     }
 
     ZeroMemory(szTempPath, cbData);
 
-    lStatus = RegQueryValueExW(
+    lResult = RegQueryValueExW(
         hCursorsKey,
         g_aszCursorRegistryNames[icon],
         NULL,
@@ -262,18 +257,15 @@ WuGetCursorW(
         (LPBYTE) szTempPath,
         &cbData);
     
-    if (lStatus != ERROR_SUCCESS)
+    if (lResult != ERROR_SUCCESS)
     {
         RegCloseKey(hCursorsKey);
         return FALSE;
     }
 
-    if (RegCloseKey(hCursorsKey) != ERROR_SUCCESS)
-    {
-        return FALSE;
-    }
+    RegCloseKey(hCursorsKey);
 
-    return _WuSafeExpandEnvironmentStringsW(
+    return _WuSafeExpandEnvironmentStrings(
         szTempPath,
         szCursorPath,
         cchCursorPath);

@@ -27,7 +27,7 @@ BOOL
 _WuSetSomethingFromResource(
     IN BOOL             bUnicode,
     IN LPCWSTR          szCacheFileName,
-    IN SETFROMFILEPROC  pfnSet,
+    IN SETFROMFILEPROC  pfnSetFromFile,
     IN HINSTANCE        hInstance,
     IN LPVOID           szResourceName,
     IN LPVOID           szResourceType,
@@ -38,26 +38,24 @@ BOOL
 _WuSetSomethingFromUrl(
     IN BOOL             bUnicode,
     IN LPCWSTR          szCacheFileName,
-    IN SETFROMFILEPROC  pfnSet,
+    IN SETFROMFILEPROC  pfnSetFromFile,
     IN LPVOID           szUrl,
     IN DWORD            dwExtraValue
     );
 
-LPWSTR
-_WuAnsiResParamToWideHeapAlloc(
-    IN LPCSTR   szAnsi
-    );
-
-VOID
-_WuSafeResParamHeapFree(
-    IN LPVOID   lpParam
+BOOL
+_WuSafeExpandEnvironmentStrings(
+    IN  LPCWSTR szSource,
+    OUT LPWSTR  szBuffer,
+    IN  DWORD   cchSize
     );
 
 BOOL
-_WuSafeExpandEnvironmentStringsW(
-    IN  LPCWSTR lpSrc,
-    OUT LPWSTR  lpDst,
-    IN  DWORD   nSize
+_WuCurrentThemeGetProperty(
+    IN  LPCWSTR szSection,
+    IN  LPCWSTR szKey,
+    OUT LPWSTR  szValue,
+    IN  ULONG   cchValueSize
     );
 
 #endif /* INTERNAL_H_INCLUDED */

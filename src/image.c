@@ -249,7 +249,7 @@ WuSaveImageDataToFileW(
 
     CLEANUP_IF_FAILED(hResult);
 
-    bResult = _WuSafeExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStrings(
         szFilePath,
         szTempPath,
         MAX_PATH);
@@ -413,7 +413,7 @@ WuLoadImageDataFromFileW(
 
     CLEANUP_IF_FAILED(hResult);
 
-    bResult = _WuSafeExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStrings(
         szFilePath,
         szTempPath,
         MAX_PATH);

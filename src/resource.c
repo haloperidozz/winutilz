@@ -70,8 +70,23 @@ WuLoadResourceToMemoryA(
     LPWSTR szwResourceType = NULL;
     LPVOID lpResourceData  = NULL;
 
-    szwResourceName = _WuAnsiResParamToWideHeapAlloc(szResourceName);
-    szwResourceType = _WuAnsiResParamToWideHeapAlloc(szResourceType);
+    if (IS_INTRESOURCE(szResourceName))
+    {
+        szwResourceName = (LPWSTR) szResourceName;
+    }
+    else
+    {
+        szwResourceName = WuAnsiToWideHeapAlloc(szResourceName);
+    }
+
+    if (IS_INTRESOURCE(szResourceType))
+    {
+        szwResourceType = (LPWSTR) szResourceType;
+    }
+    else
+    {
+        szwResourceType = WuAnsiToWideHeapAlloc(szResourceType);
+    }
 
     lpResourceData = WuLoadResourceToMemoryW(
         hInstance,
@@ -79,8 +94,15 @@ WuLoadResourceToMemoryA(
         szwResourceType,
         pcbSize);
     
-    _WuSafeResParamHeapFree(szwResourceName);
-    _WuSafeResParamHeapFree(szwResourceType);
+    if (IS_INTRESOURCE(szwResourceName) == FALSE && szwResourceName != NULL)
+    {
+        HeapFree(GetProcessHeap(), 0, szwResourceName);
+    }
+
+    if (IS_INTRESOURCE(szwResourceType) == FALSE && szwResourceType != NULL)
+    {
+        HeapFree(GetProcessHeap(), 0, szwResourceType);
+    }
     
     return lpResourceData;
 }
@@ -121,7 +143,7 @@ WuExtractResourceToFileW(
         goto cleanup;
     }
     
-    bResult = _WuSafeExpandEnvironmentStringsW(
+    bResult = _WuSafeExpandEnvironmentStrings(
         szFilePath,
         szTempPath,
         MAX_PATH);
@@ -181,9 +203,25 @@ WuExtractResourceToFileA(
     LPWSTR szwFilePath     = NULL;
     BOOL   bResult         = FALSE;
 
-    szwResourceName = _WuAnsiResParamToWideHeapAlloc(szResourceName);
-    szwResourceType = _WuAnsiResParamToWideHeapAlloc(szResourceType);
-    szwFilePath     = WuAnsiToWideHeapAlloc(szFilePath);
+    if (IS_INTRESOURCE(szResourceName))
+    {
+        szwResourceName = (LPWSTR) szResourceName;
+    }
+    else
+    {
+        szwResourceName = WuAnsiToWideHeapAlloc(szResourceName);
+    }
+
+    if (IS_INTRESOURCE(szResourceType))
+    {
+        szwResourceType = (LPWSTR) szResourceType;
+    }
+    else
+    {
+        szwResourceType = WuAnsiToWideHeapAlloc(szResourceType);
+    }
+
+    szwFilePath = WuAnsiToWideHeapAlloc(szFilePath);
 
     bResult = WuExtractResourceToFileW(
         hInstance,
@@ -196,8 +234,15 @@ WuExtractResourceToFileA(
         HeapFree(GetProcessHeap(), 0, szwFilePath);
     }
     
-    _WuSafeResParamHeapFree(szwResourceName);
-    _WuSafeResParamHeapFree(szwResourceType);
+    if (IS_INTRESOURCE(szwResourceName) == FALSE && szwResourceName != NULL)
+    {
+        HeapFree(GetProcessHeap(), 0, szwResourceName);
+    }
+
+    if (IS_INTRESOURCE(szwResourceType) == FALSE && szwResourceType != NULL)
+    {
+        HeapFree(GetProcessHeap(), 0, szwResourceType);
+    }
     
     return bResult;
 }

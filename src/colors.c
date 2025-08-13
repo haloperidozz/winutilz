@@ -12,7 +12,6 @@
 #include "winutilz.h"
 
 #include <strsafe.h>
-#include <ntstatus.h>
 
 #define REGISTRY_PATH_COLORS    L"Control Panel\\Colors"
 
@@ -61,7 +60,7 @@ WuSaveSysColors(
 {
     WCHAR   szRgbString[4 * 3 + 1];     /* "RRR GGG BBB" */
     HKEY    hColorsKey = NULL;
-    LSTATUS lStatus    = STATUS_SUCCESS;
+    LONG    lResult    = ERROR_SUCCESS;
     HRESULT hResult    = S_OK;
     INT     i;
 
@@ -75,14 +74,14 @@ WuSaveSysColors(
         return FALSE;
     }
 
-    lStatus = RegOpenKeyExW(
+    lResult = RegOpenKeyExW(
         HKEY_CURRENT_USER,
         REGISTRY_PATH_COLORS,
         0,
         KEY_SET_VALUE,
         &hColorsKey);
     
-    if ((lStatus != ERROR_SUCCESS) || (NULL == hColorsKey))
+    if ((lResult != ERROR_SUCCESS) || (NULL == hColorsKey))
     {
         return FALSE;
     }
@@ -112,7 +111,7 @@ WuSaveSysColors(
             goto on_error;
         }
 
-        lStatus = RegSetValueExW(
+        lResult = RegSetValueExW(
             hColorsKey,
             s_aszColorRegistryNames[lpaElements[i]],
             0,
@@ -120,15 +119,18 @@ WuSaveSysColors(
             (CONST BYTE*) szRgbString,
             (lstrlenW(szRgbString) + 1) * sizeof(WCHAR));
         
-        if (lStatus != ERROR_SUCCESS)
+        if (lResult != ERROR_SUCCESS)
         {
             goto on_error;
         }
     }
 
-    return (RegCloseKey(hColorsKey) == ERROR_SUCCESS);
+    RegCloseKey(hColorsKey);
+
+    return TRUE;
 
 on_error:
     RegCloseKey(hColorsKey);
+
     return FALSE;
 }
