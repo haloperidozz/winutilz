@@ -122,6 +122,11 @@ WuGetCursorA(
 #endif /* UNICODE */
 
 WUAPI BOOL
+WuResetCursor(
+    IN WU_CURSOR_ICON   icon
+    );
+
+WUAPI BOOL
 WuSetCursorFromResourceW(
     IN HINSTANCE        hInstance,
     IN LPCWSTR          szResourceName,

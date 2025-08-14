@@ -19,6 +19,8 @@
 
 #define WU_CURSOR_ICON_MAX  CURSOR_MAX
 
+#define CURSORS_THEME_SECTION   REGISTRY_PATH_CURSORS
+
 static LPCWSTR g_aszCursorRegistryNames[CURSOR_MAX] = {
     L"AppStarting",     /* OCR_APPSTARTING  */
     L"Arrow",           /* OCR_NORMAL       */
@@ -299,6 +301,35 @@ WuGetCursorA(
     }
 
     return WuWideToAnsi(szwTempPath, szCursorPath, cchCursorPath);
+}
+
+WUAPI BOOL
+WuResetCursor(
+    IN WU_CURSOR_ICON   icon
+    )
+{
+    WCHAR szCursorPath[MAX_PATH];
+    BOOL  bResult = FALSE;
+
+    if (icon >= WU_CURSOR_ICON_MAX)
+    {
+        return FALSE;
+    }
+
+    ZeroMemory(szCursorPath, sizeof(szCursorPath));
+
+    bResult = _WuCurrentThemeGetStringProperty(
+        CURSORS_THEME_SECTION,
+        g_aszCursorRegistryNames[icon],
+        szCursorPath,
+        MAX_PATH);
+    
+    if (FALSE == bResult)
+    {
+        return FALSE;
+    }
+
+    return WuSetCursorW(szCursorPath, icon);
 }
 
 WUAPI BOOL
