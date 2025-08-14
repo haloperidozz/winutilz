@@ -51,7 +51,7 @@ _WuSafeExpandEnvironmentStrings(
     );
 
 BOOL
-_WuCurrentThemeGetProperty(
+_WuCurrentThemeGetStringProperty(
     IN  LPCWSTR szSection,
     IN  LPCWSTR szKey,
     OUT LPWSTR  szValue,

@@ -184,7 +184,7 @@ _WuSetSomethingFromUrl(
         }
     }
 
-    bResult = _WuGetWinUtilzCachePath(szCacheFileName, szwTemp, MAX_PATH);
+    bResult = _WuGetWinUtilzCacheFileName(szCacheFileName, szwTemp, MAX_PATH);
 
     if (FALSE == bResult)
     {
