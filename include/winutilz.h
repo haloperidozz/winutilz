@@ -368,7 +368,7 @@ WuGetClipboardImageData(
     );
 
 /***************************************************************************
- *  colors.c
+ *  syscolors.c
  ***************************************************************************/
 
 #define COLOR_3DALTFACE 25      /* not present in winuser.h */
@@ -378,6 +378,12 @@ WuSaveSysColors(
     IN INT              cElements,
     IN CONST INT*       lpaElements,
     IN CONST LPCOLORREF lpaRgbValues
+    );
+
+WUAPI BOOL
+WuResetSysColors(
+    IN INT          cElements,
+    IN CONST INT*   lpaElements
     );
 
 /***************************************************************************

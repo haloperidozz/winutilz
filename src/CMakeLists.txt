@@ -26,7 +26,6 @@ target_sources(winutilz
         branding.c
         capture.c
         clipboard.c
-        colors.c
         cursor.c
         image.c
         inputbox.c
@@ -37,6 +36,7 @@ target_sources(winutilz
         resource.c
         shell.c
         strconv.c
+        syscolors.c
         undoc.c
         version.c
         wallpaper.c
