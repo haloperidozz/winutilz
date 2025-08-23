@@ -14,7 +14,9 @@
 #include <versionhelpers.h>
 #include <dwmapi.h>
 
+#ifndef PW_RENDERFULLCONTENT
 #define PW_RENDERFULLCONTENT    0x00000002  /* definition for clang */
+#endif /* PW_RENDERFULLCONTENT */
 
 WUAPI PWUIMAGEDATA
 WuCaptureScreen(
